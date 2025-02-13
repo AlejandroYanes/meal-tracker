@@ -4,7 +4,7 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
-import { HeadsetIcon, LogOutIcon, PalmtreeIcon, SettingsIcon, UserIcon, UsersIcon } from 'lucide-react';
+import { CookingPotIcon, HeadsetIcon, LogOutIcon, LogsIcon, ShoppingCartIcon, SoupIcon, UserIcon } from 'lucide-react';
 
 import {
   Button,
@@ -18,7 +18,6 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-  WhiteLogo,
 } from '@/ui';
 
 interface Props {
@@ -39,15 +38,15 @@ export default function NavBar(props: Props) {
       <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
         <TooltipProvider>
           <Link
-            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-orange-600 text-lg font-semibold text-gray-50 md:h-8 md:w-8 md:text-base dark:bg-gray-50 dark:text-gray-900"
-            href="/"
+            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-purple-600 text-lg font-semibold text-gray-50 md:h-8 md:w-8 md:text-base dark:bg-gray-50 dark:text-gray-900"
+            href="/landing"
           >
-            <WhiteLogo />
-            <span className="sr-only">Acme Inc</span>
+            <SoupIcon />
+            <span className="sr-only">Meal Tracker</span>
           </Link>
-          <NavItem href="/team" icon={<UsersIcon className="h-5 w-5"/>} name="Team"/>
-          <NavItem href="/time-off" icon={<PalmtreeIcon className="h-5 w-5"/>} name="Time Off"/>
-          <NavItem href="/settings" icon={<SettingsIcon className="h-5 w-5"/>} name="Settings"/>
+          <NavItem href="/intake" icon={<LogsIcon className="h-5 w-5"/>} name="Intake records"/>
+          <NavItem href="/meals" icon={<CookingPotIcon className="h-5 w-5"/>} name="Meals"/>
+          <NavItem href="/food" icon={<ShoppingCartIcon className="h-5 w-5"/>} name="Foot"/>
         </TooltipProvider>
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
