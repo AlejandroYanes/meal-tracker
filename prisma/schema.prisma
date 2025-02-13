@@ -47,6 +47,7 @@ model users {
   email          String?   @unique
   email_verified DateTime?
   image          String?
+  is_setup       Boolean   @default(false)
 }
 
 model verification_tokens {
@@ -65,8 +66,8 @@ model food {
   amount      Float
   unit        String
   carbs       Float  @default(0.0)
-  protein     Float  @default(0.0)
-  fat         Float  @default(0.0)
+  proteins    Float  @default(0.0)
+  fats        Float  @default(0.0)
   price       Float  @default(0.0)
   user_id     String
 
@@ -74,12 +75,12 @@ model food {
 }
 
 model meals {
-  id           Int    @id @default(autoincrement())
-  name         String
-  carbs_goal   Float  @default(0.0)
-  protein_goal Float  @default(0.0)
-  fat_goal     Float  @default(0.0)
-  user_id      String
+  id            Int    @id @default(autoincrement())
+  name          String
+  carbs_goal    Float  @default(0.0)
+  proteins_goal Float  @default(0.0)
+  fats_goal     Float  @default(0.0)
+  user_id       String
 
   @@index([user_id])
 }

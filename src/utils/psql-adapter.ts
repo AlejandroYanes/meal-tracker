@@ -6,10 +6,17 @@ import { nanoid } from 'nanoid';
 export function PsqlAdapter(): Adapter {
   return {
     createUser: async (data) => {
-      const response = await sql<{ id: string; email: string; email_verified: string | null; name: string; image: string }>`
+      const response = await sql<{
+        id: string;
+        email: string;
+        email_verified: string | null;
+        name: string;
+        image: string;
+        is_setup: boolean;
+      }>`
         INSERT INTO users (id, name, email, image, email_verified)
         VALUES (${nanoid()}, ${data.name}, ${data.email}, ${data.image}, ${data.emailVerified ? data.emailVerified.toDateString() : null})
-        RETURNING id, email, email_verified, name, image`;
+        RETURNING id, email, email_verified, name, image, is_setup`;
 
       const user = response.rows[0]!;
 
@@ -18,12 +25,20 @@ export function PsqlAdapter(): Adapter {
         name: user.name,
         email: user.email,
         image: user.image,
+        isSetup: user.is_setup,
         emailVerified: user.email_verified ? new Date(user.email_verified) : null,
       };
     },
     getUser: async (id) => {
-      const response = await sql<{ id: string; email: string; email_verified: string | null; name: string; image: string }>`
-        SELECT id, email, email_verified, name, image FROM users WHERE id = ${id}`;
+      const response = await sql<{
+        id: string;
+        email: string;
+        email_verified: string | null;
+        name: string;
+        image: string;
+        is_setup: boolean;
+      }>`
+        SELECT id, email, email_verified, name, image, is_setup FROM users WHERE id = ${id}`;
 
       const user = response.rows[0];
 
@@ -36,12 +51,20 @@ export function PsqlAdapter(): Adapter {
         name: user.name,
         email: user.email,
         image: user.image,
+        isSetup: user.is_setup,
         emailVerified: user.email_verified ? new Date(user.email_verified) : null,
       };
     },
     getUserByEmail: async (email) => {
-      const response = await sql<{ id: string; email: string; email_verified: string | null; name: string; image: string }>`
-        SELECT id, email, email_verified, name, image FROM users WHERE email = ${email}`;
+      const response = await sql<{
+        id: string;
+        email: string;
+        email_verified: string | null;
+        name: string;
+        image: string;
+        is_setup: boolean;
+      }>`
+        SELECT id, email, email_verified, name, image, is_setup FROM users WHERE email = ${email}`;
 
       const user = response.rows[0];
 
@@ -54,12 +77,20 @@ export function PsqlAdapter(): Adapter {
         name: user.name,
         email: user.email,
         image: user.image,
+        isSetup: user.is_setup,
         emailVerified: user.email_verified ? new Date(user.email_verified) : null,
       };
     },
     getUserByAccount: async (provider) => {
-      const response = await sql<{ id: string; email: string; email_verified: string; name: string; image: string }>`
-          SELECT US.id, US.name, US.email, US.image, US.email_verified
+      const response = await sql<{
+        id: string;
+        email: string;
+        email_verified: string;
+        name: string;
+        image: string;
+        is_setup: boolean;
+      }>`
+          SELECT US.id, US.name, US.email, US.image, US.email_verified, US.is_setup
           FROM users US INNER JOIN accounts AC ON US.id = AC.user_id
           WHERE AC.provider_account_id = ${provider.providerAccountId} AND AC.provider = ${provider.provider}`;
 
@@ -74,14 +105,22 @@ export function PsqlAdapter(): Adapter {
         name: user.name,
         email: user.email,
         image: user.image,
+        isSetup: user.is_setup,
         emailVerified: user.email_verified ? new Date(user.email_verified) : null,
       };
     },
     updateUser: async ({ id, ...data }) => {
-      const response = await sql<{ id: string; email: string; email_verified: string; name: string; image: string }>`
+      const response = await sql<{
+        id: string;
+        email: string;
+        email_verified: string;
+        name: string;
+        image: string;
+        is_setup: boolean;
+      }>`
         UPDATE users SET email_verified = ${data.emailVerified ? data.emailVerified.toDateString() : null}
         WHERE id = ${id}
-        RETURNING id, email, email_verified, name, image`;
+        RETURNING id, email, email_verified, name, image, is_setup`;
 
       const user = response.rows[0]!;
 
@@ -90,6 +129,7 @@ export function PsqlAdapter(): Adapter {
         name: user.name,
         email: user.email,
         image: user.image,
+        isSetup: user.is_setup,
         emailVerified: user.email_verified ? new Date(user.email_verified) : null,
       };
     },
@@ -120,10 +160,11 @@ export function PsqlAdapter(): Adapter {
         email: string;
         email_verified: string | null;
         image: string | null;
+        is_setup: boolean;
         expires: string;
         session_token: string;
       }>`
-        SELECT US.id, US.name, US.email, US.image, US.email_verified, SE.expires, SE.session_token
+        SELECT US.id, US.name, US.email, US.image, US.is_setup, US.email_verified, SE.expires, SE.session_token
         FROM users US
           INNER JOIN sessions SE ON US.id = SE.user_id
         WHERE SE.session_token = ${sessionToken}`;
@@ -141,6 +182,7 @@ export function PsqlAdapter(): Adapter {
         email_verified,
         image,
         expires,
+        is_setup,
       } = userAndSession;
       return {
         user: {
@@ -148,6 +190,7 @@ export function PsqlAdapter(): Adapter {
           name,
           email,
           image,
+          isSetup: is_setup,
           emailVerified: email_verified ? new Date(email_verified) : null,
         },
         session: { sessionToken, userId: id, expires: new Date(expires) },
