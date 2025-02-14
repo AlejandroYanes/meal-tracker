@@ -56,13 +56,13 @@ function MealRecord(props: { date: Date }) {
 
   const recordedMeals = meals.map((meal) => {
     const record = intakeRecords.find((record) => record.meal_id === meal.id);
-    return record ? meal : null;
+    return !!record;
   });
 
   const goalsAndSums = generateGoalsAndSums(meals, intakeRecords);
 
   return (
-    <div className="bg-white p-4 rounded-md h-56 flex flex-col gap-4">
+    <div className="bg-white p-4 rounded-md min-h-60 flex flex-col gap-10">
       <span className="text-xl font-medium">{format(date, 'dd MMM')}</span>
       {isLoadingMeals ? (
         <>
@@ -95,7 +95,7 @@ function MealRecord(props: { date: Date }) {
           </div>
         </div>
       ) : null}
-      {meals.length ? <MealBars meals={recordedMeals} /> : null}
+      {meals.length ? <MealBars meals={meals} records={recordedMeals} /> : null}
     </div>
   );
 }
@@ -103,15 +103,22 @@ function MealRecord(props: { date: Date }) {
 type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
 
-function MealBars(props: { meals: (Meal | null)[] }) {
-  const { meals } = props;
+function MealBars(props: { meals: Meal[]; records: boolean[] }) {
+  const { meals, records } = props;
   const count = meals.length;
 
   const slots = Array.from({ length: count }, () => 100/count);
-  const colors = meals.map((meal) => meal ? 'emerald' : 'neutral');
+  const colors = records.map((meal) => meal ? 'emerald' : 'neutral');
 
   return (
-    <CategoryBar values={slots} colors={colors as AvailableChartColorsKeys[]} />
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center gap-2 *:flex-1">
+        {meals.map((meal) => (
+          <span key={meal.id} className="text-xs text-center">{meal.name}</span>
+        ))}
+      </div>
+      <CategoryBar values={slots} colors={colors as AvailableChartColorsKeys[]} />
+    </div>
   );
 }
 
