@@ -70,9 +70,31 @@ function MealRecord(props: { date: Date }) {
           <Skeleton className="w-full h-5" />
           <Skeleton className="w-full h-5" />
           <Skeleton className="w-full h-5" />
+          <div className="flex-1" />
         </>
       ) : null}
-      <div className="flex-1" />
+      {meals.length ? (
+        <div className="grid grid-cols-3 my-auto">
+          <div className="flex flex-col items-center justify-center gap-2">
+            <span>
+              <span className="text-3xl font-bold">{goalsAndSums.carbsSum}</span> /{goalsAndSums.carbsTotals}
+            </span>
+            <span>Carbs</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <span>
+              <span className="text-3xl font-bold">{goalsAndSums.proteinsSum}</span> /{goalsAndSums.proteinsTotals}
+            </span>
+            <span>Proteins</span>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <span>
+              <span className="text-3xl font-bold">{goalsAndSums.fatsSum}</span> /{goalsAndSums.fatsTotals}
+            </span>
+            <span>Fats</span>
+          </div>
+        </div>
+      ) : null}
       {meals.length ? <MealBars meals={recordedMeals} /> : null}
     </div>
   );
@@ -147,8 +169,8 @@ function generateGoalsAndSums(meals: Meal[], records: Record[]) {
   });
 
   return {
-    carbsTotals,
-    carbsSum,
+    carbsTotals: carbsTotals.toFixed(1),
+    carbsSum: Math.fround(carbsSum),
     proteinsTotals,
     proteinsSum,
     fatsTotals,

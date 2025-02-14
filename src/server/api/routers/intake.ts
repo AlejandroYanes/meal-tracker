@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { format } from 'date-fns';
 import { sql } from '@vercel/postgres';
 
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
@@ -53,7 +54,7 @@ export const intakeRouter = createTRPCRouter({
       FROM meals m
       LEFT JOIN meal_intakes mi ON mi.meal_id = m.id
       LEFT JOIN food f ON f.id = mi.food_id
-      WHERE mi.for_date = ${input.day.toDateString()} AND mi.user_id = ${userId}
+      WHERE mi.for_date::DATE = ${format(input.day, 'yyyy-mm-dd')} AND mi.user_id = ${userId}
       GROUP BY m.id, m.name, m.carbs_goal, m.proteins_goal, m.fats_goal
       ORDER BY m.name;`;
       return intakeRecordsQ.rows;
