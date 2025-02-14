@@ -7,7 +7,7 @@ export default async function Home() {
   const session = await getServerAuthSession();
 
   if (session?.user) {
-    redirect('/onboarding');
+    redirect('/intake');
   }
 
   return (

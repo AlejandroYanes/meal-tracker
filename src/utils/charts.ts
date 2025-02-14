@@ -57,6 +57,12 @@ export const chartColors = {
     fill: 'fill-fuchsia-500',
     text: 'text-fuchsia-500',
   },
+  neutral: {
+    bg: 'bg-neutral-200',
+    stroke: 'stroke-neutral-500',
+    fill: 'fill-neutral-500',
+    text: 'text-neutral-500',
+  },
 } as const satisfies Record<string, {
     [key in ColorUtility]: string
   }>;

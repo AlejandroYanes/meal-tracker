@@ -14,9 +14,9 @@ export default function VerifyEmailPage() {
             <br/>
             Please check your inbox.
           </p>
-          <Link href="/">
-            <Button variant="outline">
-              <ArrowLeftIcon className="mr-2" />
+          <Link href="/" className="mt-4">
+            <Button variant="link">
+              <ArrowLeftIcon className="mr-2 w-4 h-4" />
               Go back
             </Button>
           </Link>

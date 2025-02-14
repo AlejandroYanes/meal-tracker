@@ -4,7 +4,15 @@ import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
-import { CookingPotIcon, HeadsetIcon, LogOutIcon, LogsIcon, ShoppingCartIcon, SoupIcon, UserIcon } from 'lucide-react';
+import {
+  CalendarDaysIcon,
+  CookingPotIcon,
+  HeadsetIcon,
+  LogOutIcon,
+  ShoppingCartIcon,
+  SoupIcon,
+  UserIcon,
+} from 'lucide-react';
 
 import {
   Button,
@@ -44,9 +52,9 @@ export default function NavBar(props: Props) {
             <SoupIcon />
             <span className="sr-only">Meal Tracker</span>
           </Link>
-          <NavItem href="/intake" icon={<LogsIcon className="h-5 w-5"/>} name="Intake records"/>
+          <NavItem href="/intake" icon={<CalendarDaysIcon className="h-5 w-5"/>} name="Intake records"/>
           <NavItem href="/meals" icon={<CookingPotIcon className="h-5 w-5"/>} name="Meals"/>
-          <NavItem href="/food" icon={<ShoppingCartIcon className="h-5 w-5"/>} name="Foot"/>
+          <NavItem href="/groceries" icon={<ShoppingCartIcon className="h-5 w-5"/>} name="Groceries"/>
         </TooltipProvider>
       </nav>
       <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
