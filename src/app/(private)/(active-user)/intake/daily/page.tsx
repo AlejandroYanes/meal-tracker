@@ -1,156 +1,114 @@
 'use client';
 
 import { useState } from 'react';
-import { addDays, addWeeks, format, startOfWeek, subWeeks } from 'date-fns';
+import { addDays, subDays } from 'date-fns';
 import { type inferRouterOutputs } from '@trpc/server';
+import { ChevronLeftIcon, ChevronRightIcon, NotebookPenIcon } from 'lucide-react';
+import { keepPreviousData } from '@tanstack/query-core';
 
-import { Skeleton, Tabs, TabsList, TabsTrigger } from '@/ui';
-import { CategoryBar } from '@/ui/category-bar';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DatePicker,
+  ProgressCircle,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/ui';
 import { api } from '@/trpc/react';
-import type { AvailableChartColorsKeys } from '@/utils/charts';
 import { type AppRouter } from '@/server/api/root';
 
 export default function IntakePage() {
-  const [weekRef, setWeekRef] = useState('current');
+  const [date, setDate] = useState(new Date());
 
-  const __generateWeek = () => {
-    switch (weekRef) {
-      case 'past':
-        return generatePastWeek();
-      case 'current':
-        return generateThisWeek();
-      case 'next':
-        return generateNextWeek();
-      default:
-        return [];
-    }
+  const { data: meals = [] } = api.meals.list.useQuery();
+  const { data: records = [] } = api.intake.forDay.useQuery({ day: date }, { placeholderData: keepPreviousData });
+
+  const goToPrevDay = () => {
+    const nextDate = subDays(date, 1);
+    setDate(nextDate);
   };
 
-  const week = __generateWeek();
+  const goToNextDay = () => {
+    const nextDate = addDays(date, 1);
+    setDate(nextDate);
+  }
 
   return (
-    <section className="flex flex-col gap-10 pt-10">
-      <div className="flex items-center justify-end gap-4">
-        <Tabs defaultValue="current" onValueChange={setWeekRef}>
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="past">Past week</TabsTrigger>
-            <TabsTrigger value="current">This week</TabsTrigger>
-            <TabsTrigger value="next">Next week</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-      <div className="grid grid-cols-4 gap-6">
-        {week.map((item) => (
-          <MealRecord key={format(item, 'dd-mm-yyyy')} date={item} />
-        ))}
-      </div>
+    <section className="flex flex-col gap-10">
+      <Card>
+        <CardHeader className="space-y-0 flex flex-row items-center justify-between">
+          <div className="flex items-center justify-end gap-4">
+            <Button variant="outline" size="icon" onClick={goToPrevDay}>
+              <ChevronLeftIcon className="w-4 h-4" />
+            </Button>
+            <DatePicker date={date} defaultMonth={date} onChange={(__date) => setDate(__date!)} />
+            <Button variant="outline" size="icon" onClick={goToNextDay}>
+              <ChevronRightIcon className="w-4 h-4" />
+            </Button>
+          </div>
+          <div className="flex items-center gap-4">
+            <ProgressCircle variant="neutral" value={62} radius={24}>
+              <span className="text-xs font-medium text-gray-900 dark:text-gray-50">C</span>
+            </ProgressCircle>
+            <ProgressCircle variant="neutral" value={62} radius={24}>
+              <span className="text-xs font-medium text-gray-900 dark:text-gray-50">P</span>
+            </ProgressCircle>
+            <ProgressCircle variant="neutral" value={62} radius={24}>
+              <span className="text-xs font-medium text-gray-900 dark:text-gray-50">F</span>
+            </ProgressCircle>
+          </div>
+        </CardHeader>
+      </Card>
+      {meals.map(meal => (
+        <MealCard key={meal.id} meal={meal} />
+      ))}
     </section>
-  );
-}
-
-function MealRecord(props: { date: Date }) {
-  const { date } = props;
-
-  const { data: meals = [], isLoading: isLoadingMeals } = api.meals.list.useQuery(undefined, { refetchOnMount: false });
-  const { data: intakeRecords = [] } = api.intake.forDay.useQuery({ day: date });
-
-  const recordedMeals = meals.map((meal) => {
-    const record = intakeRecords.find((record) => record.meal_id === meal.id);
-    return !!record;
-  });
-
-  const goalsAndSums = generateGoalsAndSums(meals, intakeRecords);
-
-  return (
-    <div className="bg-white p-4 rounded-md min-h-60 flex flex-col">
-      <span className="text-xl font-medium">{format(date, 'dd MMM')}</span>
-      {isLoadingMeals ? (
-        <div className="flex flex-col gap-4 my-auto">
-          <Skeleton className="w-full h-5" />
-          <Skeleton className="w-full h-5" />
-          <Skeleton className="w-full h-5" />
-          <Skeleton className="w-full h-5" />
-        </div>
-      ) : null}
-      {meals.length ? (
-        <div className="grid grid-cols-3 my-auto">
-          <div className="flex flex-col items-center justify-center gap-2">
-            <span>
-              <span className="text-3xl font-bold">{goalsAndSums.carbsSum}</span> /{goalsAndSums.carbsTotals}
-            </span>
-            <span>Carbs</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2">
-            <span>
-              <span className="text-3xl font-bold">{goalsAndSums.proteinsSum}</span> /{goalsAndSums.proteinsTotals}
-            </span>
-            <span>Proteins</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2">
-            <span>
-              <span className="text-3xl font-bold">{goalsAndSums.fatsSum}</span> /{goalsAndSums.fatsTotals}
-            </span>
-            <span>Fats</span>
-          </div>
-        </div>
-      ) : null}
-      {meals.length ? <MealBars meals={meals} records={recordedMeals} /> : null}
-    </div>
   );
 }
 
 type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
 
-function MealBars(props: { meals: Meal[]; records: boolean[] }) {
-  const { meals, records } = props;
-  const count = meals.length;
-
-  const slots = Array.from({ length: count }, () => 100/count);
-  const colors = records.map((meal) => meal ? 'emerald' : 'neutral');
-
+function MealCard(props: { meal: Meal }) {
+  const { meal } = props;
   return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 *:flex-1">
-        {meals.map((meal) => (
-          <span key={meal.id} className="text-xs text-center">{meal.name}</span>
-        ))}
-      </div>
-      <CategoryBar values={slots} colors={colors as AvailableChartColorsKeys[]} />
-    </div>
-  );
-}
-
-function generateThisWeek() {
-  const today = new Date();
-  return generateWeek(today);
-}
-
-function generatePastWeek() {
-  const today = new Date();
-  const lastWeek = subWeeks(today, 1);
-  return generateWeek(lastWeek);
-}
-
-function generateNextWeek() {
-  const today = new Date();
-  const lastWeek = addWeeks(today, 1);
-  return generateWeek(lastWeek);
-}
-
-function generateWeek(date: Date) {
-  const __startOfWeek = startOfWeek(date);
-  const weekArr = new Array<Date>(7);
-
-  for (let i = 0; i < weekArr.length; i++) {
-    if (i === 0) {
-      weekArr[i] = __startOfWeek;
-    } else {
-      weekArr[i] = addDays(__startOfWeek, i);
-    }
-  }
-
-  return weekArr;
+    <Card>
+      <CardHeader className="space-y-0 flex flex-row items-center justify-between">
+        <CardTitle className="text-lg font-medium">{meal.name}</CardTitle>
+        <Button variant="link">
+          <NotebookPenIcon className="w-4 h-4 mr-2" />
+          Add food record
+        </Button>
+      </CardHeader>
+      <CardContent className="pt-6">
+        <Table className="table-fixed">
+          <TableHeader>
+            <TableRow>
+              <TableHead>Name</TableHead>
+              <TableHead className="w-28 text-center">Carbs</TableHead>
+              <TableHead className="w-28 text-center">Proteins</TableHead>
+              <TableHead className="w-28 text-center">Fats</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell>test</TableCell>
+              <TableCell className="text-center">test</TableCell>
+              <TableCell className="text-center">test</TableCell>
+              <TableCell className="text-center">test</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  )
 }
 
 function generateGoalsAndSums(meals: Meal[], records: Record[]) {
