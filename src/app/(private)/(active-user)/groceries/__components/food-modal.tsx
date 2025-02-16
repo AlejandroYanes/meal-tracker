@@ -228,7 +228,7 @@ export default function FoodModal(props: Props) {
             />
           </div>
           {errorMessage ? (
-            <span className="text-red-500 text-sm">{errorMessage}</span>
+            <span className="text-red-500 text-sm font-medium">{errorMessage}</span>
           ) : null}
           <DialogFooter className="pt-6">
             <Button className="px-6" disabled={isPending}>

@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { sql } from '@vercel/postgres';
 
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
+import { tql } from '@/utils/tql';
 
 export const intakeRouter = createTRPCRouter({
   forDay: protectedProcedure
@@ -54,9 +55,26 @@ export const intakeRouter = createTRPCRouter({
       FROM meals m
       LEFT JOIN meal_intakes mi ON mi.meal_id = m.id
       LEFT JOIN food f ON f.id = mi.food_id
-      WHERE mi.for_date::DATE = ${format(input.day, 'yyyy-mm-dd')} AND mi.user_id = ${userId}
+      WHERE mi.for_date::DATE = ${format(input.day, 'yyyy-MM-dd')} AND mi.user_id = ${userId}
       GROUP BY m.id, m.name, m.carbs_goal, m.proteins_goal, m.fats_goal
       ORDER BY m.name;`;
       return intakeRecordsQ.rows;
+    }),
+
+  add: protectedProcedure
+    .input(z.object({
+      meal_id: z.number(),
+      for_date: z.date(),
+      food_id: z.number().min(0, 'Please select a food item'),
+      amount: z.number().min(0, 'Please enter an amount'),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const [insertQ, insertP] = tql.query`
+        INSERT INTO meal_intakes ${tql.VALUES({ ...input, for_date: input.for_date.toDateString(), user_id: userId })}`;
+      await sql.query(insertQ, insertP);
+
+      return true;
     }),
 });
