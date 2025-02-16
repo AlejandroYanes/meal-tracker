@@ -62,35 +62,31 @@ function MealRecord(props: { date: Date }) {
   const goalsAndSums = generateGoalsAndSums(meals, intakeRecords);
 
   return (
-    <div className="bg-white p-4 rounded-md min-h-60 flex flex-col gap-10">
+    <div className="bg-white p-4 rounded-md min-h-60 flex flex-col">
       <span className="text-xl font-medium">{format(date, 'dd MMM')}</span>
       {isLoadingMeals ? (
-        <>
+        <div className="flex flex-col gap-4 my-auto">
           <Skeleton className="w-full h-5" />
           <Skeleton className="w-full h-5" />
           <Skeleton className="w-full h-5" />
           <Skeleton className="w-full h-5" />
-          <div className="flex-1" />
-        </>
+        </div>
       ) : null}
       {meals.length ? (
         <div className="grid grid-cols-3 my-auto">
           <div className="flex flex-col items-center justify-center gap-2">
-            <span>
-              <span className="text-3xl font-bold">{goalsAndSums.carbsSum}</span> /{goalsAndSums.carbsTotals}
-            </span>
+            <span className="text-3xl font-bold">{goalsAndSums.carbsSum}</span>
+            <span>{goalsAndSums.carbsTotals}</span>
             <span>Carbs</span>
           </div>
           <div className="flex flex-col items-center justify-center gap-2">
-            <span>
-              <span className="text-3xl font-bold">{goalsAndSums.proteinsSum}</span> /{goalsAndSums.proteinsTotals}
-            </span>
+            <span className="text-3xl font-bold">{goalsAndSums.proteinsSum}</span>
+            <span>{goalsAndSums.proteinsTotals}</span>
             <span>Proteins</span>
           </div>
           <div className="flex flex-col items-center justify-center gap-2">
-            <span>
-              <span className="text-3xl font-bold">{goalsAndSums.fatsSum}</span> /{goalsAndSums.fatsTotals}
-            </span>
+            <span className="text-3xl font-bold">{goalsAndSums.fatsSum}</span>
+            <span>{goalsAndSums.fatsTotals}</span>
             <span>Fats</span>
           </div>
         </div>
@@ -177,10 +173,10 @@ function generateGoalsAndSums(meals: Meal[], records: Record[]) {
 
   return {
     carbsTotals: carbsTotals.toFixed(1),
-    carbsSum: Math.fround(carbsSum),
-    proteinsTotals,
-    proteinsSum,
-    fatsTotals,
-    fatsSum,
+    carbsSum: Math.fround(carbsSum).toFixed(1),
+    proteinsTotals: proteinsTotals.toFixed(1),
+    proteinsSum: Math.fround(proteinsSum).toFixed(1),
+    fatsTotals: fatsTotals.toFixed(1),
+    fatsSum: Math.fround(fatsSum).toFixed(1),
   };
 }

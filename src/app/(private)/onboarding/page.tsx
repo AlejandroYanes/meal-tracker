@@ -63,7 +63,7 @@ export default function OnboardingPage() {
   const handleSetupUser = async () => {
     await initUser({ meals });
     await update({ ...session, user: { ...session!.user, isSetup: true } });
-    router.push('/landing');
+    router.push('/intake/daily');
   };
 
   return (
