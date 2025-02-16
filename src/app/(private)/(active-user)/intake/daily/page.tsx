@@ -6,7 +6,17 @@ import { type inferRouterOutputs } from '@trpc/server';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { keepPreviousData } from '@tanstack/query-core';
 
-import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker, ProgressCircle } from '@/ui';
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  DatePicker,
+  ProgressCircle,
+  Tooltip, TooltipContent,
+  TooltipProvider, TooltipTrigger,
+} from '@/ui';
 import { api } from '@/trpc/react';
 import { type AppRouter } from '@/server/api/root';
 import MealCard from './__components/meal-card';
@@ -50,15 +60,9 @@ export default function IntakePage() {
             </Button>
           </div>
           <div className="flex items-center gap-4">
-            <ProgressCircle variant="neutral" value={carbsRatio} radius={24}>
-              <span title={`Carbs: ${carbsRatio}%`} className="text-xs font-medium text-gray-900 cursor-default">C</span>
-            </ProgressCircle>
-            <ProgressCircle variant="neutral" value={proteinsRatio} radius={24}>
-              <span title={`Proteins: ${proteinsRatio}%`} className="text-xs font-medium text-gray-900 cursor-default">P</span>
-            </ProgressCircle>
-            <ProgressCircle variant="neutral" value={fatsRatio} radius={24}>
-              <span title={`Fats: ${fatsRatio}%`} className="text-xs font-medium text-gray-900 cursor-default">F</span>
-            </ProgressCircle>
+            <GoalTrack label="Carbs" value={carbsRatio} />
+            <GoalTrack label="Proteins" value={proteinsRatio} />
+            <GoalTrack label="Fats" value={fatsRatio} />
           </div>
         </CardContent>
       </Card>
@@ -66,6 +70,25 @@ export default function IntakePage() {
         <MealCard key={meal.id} meal={meal} day={date} />
       ))}
     </section>
+  );
+}
+
+function GoalTrack({ label, value }: { label: string; value: number }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div>
+            <ProgressCircle variant="neutral" value={value} radius={24}>
+              <span className="text-xs font-medium text-gray-900 cursor-default capitalize">{label.at(0)}</span>
+            </ProgressCircle>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{label}: {value}%</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   );
 }
 
@@ -96,12 +119,18 @@ function generateGoalsAndSums(meals: Meal[], records: Record[]) {
   return {
     carbsTotals: carbsTotals.toFixed(1),
     carbsSum: Math.fround(carbsSum).toFixed(1),
-    carbsRatio: Math.round(((carbsSum / carbsTotals) * 100)),
+    carbsRatio: getNumberOrZero(Math.round(((carbsSum / carbsTotals) * 100))),
     proteinsTotals: proteinsTotals.toFixed(1),
     proteinsSum: Math.fround(proteinsSum).toFixed(1),
-    proteinsRatio: Math.round(((proteinsSum / proteinsTotals) * 100)),
+    proteinsRatio: getNumberOrZero(Math.round(((proteinsSum / proteinsTotals) * 100))),
     fatsTotals: fatsTotals.toFixed(1),
     fatsSum: Math.fround(fatsSum).toFixed(1),
-    fatsRatio: Math.round(((fatsSum / fatsTotals) * 100)),
+    fatsRatio: getNumberOrZero(Math.round(((fatsSum / fatsTotals) * 100))),
   };
+}
+
+function getNumberOrZero(num: number) {
+  if (Number.isNaN(num)) return 0;
+
+  return num;
 }

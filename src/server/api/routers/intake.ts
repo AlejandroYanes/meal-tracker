@@ -38,26 +38,26 @@ export const intakeRouter = createTRPCRouter({
           m.carbs_goal,
           m.proteins_goal,
           m.fats_goal,
-          JSON_AGG(
-              JSON_BUILD_OBJECT(
-                  'id', f.id,
-                  'name', f.name,
-                  'description', f.description,
-                  'notes', f.notes,
-                  'amount', f.amount,
-                  'unit', f.unit,
-                  'carbs', f.carbs,
-                  'proteins', f.proteins,
-                  'fats', f.fats,
-                  'price', f.price
-              )
-          ) AS foods
-      FROM meals m
-      LEFT JOIN meal_intakes mi ON mi.meal_id = m.id
-      LEFT JOIN food f ON f.id = mi.food_id
-      WHERE mi.for_date::DATE = ${format(input.day, 'yyyy-MM-dd')} AND mi.user_id = ${userId}
-      GROUP BY m.id, m.name, m.carbs_goal, m.proteins_goal, m.fats_goal
-      ORDER BY m.name;`;
+          COALESCE(JSON_AGG(
+            CASE WHEN f.id IS NOT NULL THEN JSON_BUILD_OBJECT(
+              'id', f.id,
+              'name', f.name,
+              'description', f.description,
+              'notes', f.notes,
+              'amount', mi.amount,
+              'unit', f.unit,
+              'carbs', f.carbs,
+              'proteins', f.proteins,
+              'fats', f.fats,
+              'price', f.price
+                ) END
+              ) FILTER (WHERE f.id IS NOT NULL AND f.is_hidden = false), '[]') AS foods
+        FROM meals m
+          LEFT JOIN meal_intakes mi ON mi.meal_id = m.id AND mi.for_date::DATE = ${format(input.day, 'yyyy-MM-dd')} AND mi.user_id = ${userId}
+          LEFT JOIN food f ON f.id = mi.food_id
+        WHERE m.is_hidden = false
+        GROUP BY m.id, m.name, m.carbs_goal, m.proteins_goal, m.fats_goal
+        ORDER BY m.name;`;
       return intakeRecordsQ.rows;
     }),
 

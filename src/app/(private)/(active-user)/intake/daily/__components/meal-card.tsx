@@ -54,6 +54,7 @@ export default function MealCard(props: Props) {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
+              <TableHead className="w-28 text-center">Amount</TableHead>
               <TableHead className="w-28 text-center">Carbs</TableHead>
               <TableHead className="w-28 text-center">Proteins</TableHead>
               <TableHead className="w-28 text-center">Fats</TableHead>
@@ -63,6 +64,8 @@ export default function MealCard(props: Props) {
             {foodRecords.map((food) => (
               <TableRow key={food.id}>
                 <TableCell>{food.name}</TableCell>
+                <TableCell className="w-28 text-center">{food.amount}{food.unit === 'piece' ? ` ${food.unit}` : food.unit}</TableCell>
+                {/* TODO: calculate these values below based on the food distribution per unit and the actual consumed */}
                 <TableCell className="w-28 text-center">{food.carbs}</TableCell>
                 <TableCell className="w-28 text-center">{food.proteins}</TableCell>
                 <TableCell className="w-28 text-center">{food.fats}</TableCell>
