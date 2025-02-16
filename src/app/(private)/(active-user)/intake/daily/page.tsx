@@ -3,26 +3,13 @@
 import { useState } from 'react';
 import { addDays, subDays } from 'date-fns';
 import { type inferRouterOutputs } from '@trpc/server';
-import { ChevronLeftIcon, ChevronRightIcon, NotebookPenIcon } from 'lucide-react';
+import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { keepPreviousData } from '@tanstack/query-core';
 
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DatePicker,
-  ProgressCircle,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/ui';
+import { Button, Card, CardHeader, DatePicker, ProgressCircle } from '@/ui';
 import { api } from '@/trpc/react';
 import { type AppRouter } from '@/server/api/root';
+import MealCard from './__components/meal-card';
 
 export default function IntakePage() {
   const [date, setDate] = useState(new Date());
@@ -75,41 +62,6 @@ export default function IntakePage() {
 
 type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
-
-function MealCard(props: { meal: Meal }) {
-  const { meal } = props;
-  return (
-    <Card>
-      <CardHeader className="space-y-0 flex flex-row items-center justify-between">
-        <CardTitle className="text-lg font-medium">{meal.name}</CardTitle>
-        <Button variant="link">
-          <NotebookPenIcon className="w-4 h-4 mr-2" />
-          Add food record
-        </Button>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <Table className="table-fixed">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead className="w-28 text-center">Carbs</TableHead>
-              <TableHead className="w-28 text-center">Proteins</TableHead>
-              <TableHead className="w-28 text-center">Fats</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell>test</TableCell>
-              <TableCell className="text-center">test</TableCell>
-              <TableCell className="text-center">test</TableCell>
-              <TableCell className="text-center">test</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-    </Card>
-  )
-}
 
 function generateGoalsAndSums(meals: Meal[], records: Record[]) {
   let carbsTotals = 0;

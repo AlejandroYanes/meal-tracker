@@ -11,7 +11,7 @@ generator client {
 // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL_UNPOOLED") // uses connection pooling
+  url      = env("POSTGRES_PRISMA_URL") // uses connection pooling
 }
 
 // Necessary for Next auth
@@ -58,17 +58,18 @@ model verification_tokens {
 }
 
 model food {
-  id          Int    @id @default(autoincrement())
+  id          Int     @id @default(autoincrement())
   name        String
   description String
   notes       String
   amount      Float
   unit        String
-  carbs       Float  @default(0.0)
-  proteins    Float  @default(0.0)
-  fats        Float  @default(0.0)
-  price       Float  @default(0.0)
+  carbs       Float   @default(0.0)
+  proteins    Float   @default(0.0)
+  fats        Float   @default(0.0)
+  price       Float   @default(0.0)
   user_id     String
+  is_hidden   Boolean @default(false)
 
   @@index([user_id])
 }

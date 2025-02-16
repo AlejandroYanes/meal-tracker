@@ -47,12 +47,12 @@ export default function NavBar(props: Props) {
         <TooltipProvider>
           <Link
             className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-purple-600 text-lg font-semibold text-gray-50 md:h-8 md:w-8 md:text-base dark:bg-gray-50 dark:text-gray-900"
-            href="/landing"
+            href="/intake/daily"
           >
             <SoupIcon />
             <span className="sr-only">Meal Tracker</span>
           </Link>
-          <NavItem href="/intake" icon={<CalendarDaysIcon className="h-5 w-5"/>} name="Intake records"/>
+          <NavItem href="/intake/daily" icon={<CalendarDaysIcon className="h-5 w-5"/>} name="Intake records"/>
           <NavItem href="/meals" icon={<CookingPotIcon className="h-5 w-5"/>} name="Meals"/>
           <NavItem href="/groceries" icon={<ShoppingCartIcon className="h-5 w-5"/>} name="Groceries"/>
         </TooltipProvider>

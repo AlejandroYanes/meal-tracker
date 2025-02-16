@@ -2,6 +2,7 @@ import { createCallerFactory, createTRPCRouter } from '@/server/api/trpc';
 import { setupRouter } from '@/server/api/routers/setup';
 import { mealsRouter } from '@/server/api/routers/meals';
 import { intakeRouter } from '@/server/api/routers/intake';
+import { foodRouter } from '@/server/api/routers/food';
 
 /**
  * This is the primary router for your server.
@@ -11,6 +12,7 @@ import { intakeRouter } from '@/server/api/routers/intake';
 export const appRouter = createTRPCRouter({
   setup: setupRouter,
   meals: mealsRouter,
+  food: foodRouter,
   intake: intakeRouter,
 });
 
