@@ -80,7 +80,7 @@ export default function FoodModal(props: Props) {
         <DialogHeader>
           <DialogTitle>Add food</DialogTitle>
           <DialogDescription>
-            Add the details of food so you can track it later on.
+            Add the details of the food so you can track it later on.
           </DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-6 pt-6" onSubmit={handleSubmit}>

@@ -17,26 +17,26 @@ import {
 import { api } from '@/trpc/react';
 import type { AppRouter } from '@/server/api/root';
 
-type Food = inferRouterOutputs<AppRouter>['food']['list'][0];
+type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 
 interface Props {
-  food: Food;
+  meal: Meal;
   onClose: () => void;
 }
 
-export default function DeleteFoodModal(props: Props) {
-  const { food, onClose } = props;
+export default function DeleteMealModal(props: Props) {
+  const { meal, onClose } = props;
 
   const { toast } = useToast();
   const utils = api.useUtils();
-  const { mutate: removeFood, isPending } = api.food.remove.useMutation({
+  const { mutate: removeMeal, isPending } = api.meals.remove.useMutation({
     onSuccess: () => {
-      void utils.food.list.invalidate();
+      void utils.meals.list.invalidate();
       onClose();
     },
     onError: (error) => {
       toast({
-        title: 'Failed to delete the food item',
+        title: 'Failed to delete the meal item',
         description: error.message
       })
     },
@@ -55,10 +55,8 @@ export default function DeleteFoodModal(props: Props) {
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
             {/* eslint-disable-next-line react/no-unescaped-entities */}
-            The <strong>"{food.name}"</strong> item will not be deleted as it might have been used already,
+            The <strong>"{meal.name}"</strong> item will not be deleted as it might have been used already,
             but you will not be able to use it in the future.
-            If you used it to record a meal intake you will see it there,
-            but it will not show up as a option when adding new records.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -66,7 +64,7 @@ export default function DeleteFoodModal(props: Props) {
           <AlertDialogAction
             variant="destructive"
             disabled={isPending}
-            onClick={() => removeFood({ id: food.id })}
+            onClick={() => removeMeal({ id: meal.id })}
           >
             <RenderIf condition={isPending}>
               <Loader color="white" size="xs" className="mr-2"/>

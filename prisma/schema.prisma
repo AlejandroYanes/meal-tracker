@@ -75,12 +75,13 @@ model food {
 }
 
 model meals {
-  id            Int    @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   name          String
-  carbs_goal    Float  @default(0.0)
-  proteins_goal Float  @default(0.0)
-  fats_goal     Float  @default(0.0)
+  carbs_goal    Float   @default(0.0)
+  proteins_goal Float   @default(0.0)
+  fats_goal     Float   @default(0.0)
   user_id       String
+  is_hidden     Boolean @default(false)
 
   @@index([user_id])
 }
