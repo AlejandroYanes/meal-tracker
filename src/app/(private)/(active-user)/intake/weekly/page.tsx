@@ -61,7 +61,7 @@ function MealRecord(props: { date: Date }) {
   const goalsAndSums = generateGoalsAndSums(intakeRecords);
 
   return (
-    <div data-hightlight={formattedDate === today} className="bg-white p-4 rounded-md min-h-60 flex flex-col border data-[hightlight=true]:border-purple-700">
+    <div data-hightlight={formattedDate === today} className="bg-white p-4 rounded-md min-h-60 flex flex-col gap-10 border data-[hightlight=true]:border-purple-700">
       <span className="text-xl font-medium">{shortDate}</span>
       {isLoadingMeals ? (
         <div className="flex flex-col gap-4 my-auto">
@@ -88,7 +88,6 @@ type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
 
 function MealBars(props: { meals: Meal[]; records: Record[] }) {
   const { meals, records } = props;
-  const count = meals.length;
 
   return (
     <div className="flex flex-col gap-2">
@@ -100,7 +99,14 @@ function MealBars(props: { meals: Meal[]; records: Record[] }) {
           return (
             <div key={meal.id}>
               <span className="text-xs text-center">{meal.name}</span>
-              <CategoryBar values={[33, 33, 33]} colors={['emerald', 'emerald', 'emerald'] as AvailableChartColorsKeys[]} />
+              <CategoryBar
+                values={[33, 33, 33]}
+                colors={[
+                  resolveColor(goalsAndSums.carbsRatio),
+                  resolveColor(goalsAndSums.proteinsRatio),
+                  resolveColor(goalsAndSums.fatsRatio)
+                ] as AvailableChartColorsKeys[]}
+              />
             </div>
           )
         })}
@@ -143,8 +149,8 @@ function generateWeek(date: Date) {
 
 function resolveColor(ratio: number) {
   if (ratio > 120) return 'fuchsia';
-  if (80 <= ratio && ratio <= 100) return 'success';
-  if (30 <= ratio && ratio <= 79) return 'warning';
-  if (1 <= ratio && ratio <= 29) return 'error';
+  if (80 <= ratio && ratio <= 100) return 'emerald';
+  if (30 <= ratio && ratio <= 79) return 'amber';
+  if (1 <= ratio && ratio <= 29) return 'red';
   return 'neutral';
 }
