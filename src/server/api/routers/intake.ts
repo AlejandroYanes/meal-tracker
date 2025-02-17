@@ -24,7 +24,8 @@ export const intakeRouter = createTRPCRouter({
           name: string;
           description: string;
           notes: string;
-          amount: number;
+          base_amount: number;
+          amount_consumed: number;
           unit: string;
           carbs: number;
           proteins: number;
@@ -44,7 +45,8 @@ export const intakeRouter = createTRPCRouter({
               'name', f.name,
               'description', f.description,
               'notes', f.notes,
-              'amount', mi.amount,
+              'base_amount', f.amount,
+              'amount_consumed', mi.amount,
               'unit', f.unit,
               'carbs', f.carbs,
               'proteins', f.proteins,

@@ -2,36 +2,21 @@
 
 import { useState } from 'react';
 import { addDays, subDays } from 'date-fns';
-import { type inferRouterOutputs } from '@trpc/server';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { keepPreviousData } from '@tanstack/query-core';
 
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  DatePicker,
-  ProgressCircle,
-  Tooltip, TooltipContent,
-  TooltipProvider, TooltipTrigger,
-} from '@/ui';
+import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker } from '@/ui';
 import { api } from '@/trpc/react';
-import { type AppRouter } from '@/server/api/root';
 import MealCard from './__components/meal-card';
+import GoalRing from './__components/goal-ring';
+import { generateGoalsAndSums } from './__helpers/exchanges';
 
 export default function IntakePage() {
   const [date, setDate] = useState(new Date());
 
   const { data: meals = [] } = api.meals.list.useQuery();
-  const { data: records = [] } = api.intake.forDay.useQuery({ day: date }, { placeholderData: keepPreviousData });
+  const { data: records = [] } = api.intake.forDay.useQuery({ day: date });
 
-  const {
-    carbsRatio,
-    proteinsRatio,
-    fatsRatio,
-  } = generateGoalsAndSums(meals, records);
+  const goalsAndSums = generateGoalsAndSums(records);
 
   const goToPrevDay = () => {
     const nextDate = subDays(date, 1);
@@ -60,9 +45,9 @@ export default function IntakePage() {
             </Button>
           </div>
           <div className="flex items-center gap-4">
-            <GoalTrack label="Carbs" value={carbsRatio} />
-            <GoalTrack label="Proteins" value={proteinsRatio} />
-            <GoalTrack label="Fats" value={fatsRatio} />
+            <GoalRing label="Carbs" ratio={goalsAndSums.carbsRatio} sum={goalsAndSums.carbsSum} total={goalsAndSums.carbsTotals} />
+            <GoalRing label="Proteins" ratio={goalsAndSums.proteinsRatio} sum={goalsAndSums.proteinsSum} total={goalsAndSums.proteinsTotals} />
+            <GoalRing label="Fats" ratio={goalsAndSums.fatsRatio} sum={goalsAndSums.fatsSum} total={goalsAndSums.fatsTotals} />
           </div>
         </CardContent>
       </Card>
@@ -71,66 +56,4 @@ export default function IntakePage() {
       ))}
     </section>
   );
-}
-
-function GoalTrack({ label, value }: { label: string; value: number }) {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div>
-            <ProgressCircle variant="neutral" value={value} radius={24}>
-              <span className="text-xs font-medium text-gray-900 cursor-default capitalize">{label.at(0)}</span>
-            </ProgressCircle>
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{label}: {value}%</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-}
-
-type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
-type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
-
-function generateGoalsAndSums(meals: Meal[], records: Record[]) {
-  let carbsTotals = 0;
-  let carbsSum = 0;
-  let proteinsTotals = 0;
-  let proteinsSum = 0;
-  let fatsTotals = 0;
-  let fatsSum = 0;
-
-  meals.forEach((meal) => {
-    carbsTotals = carbsTotals + meal.carbs_goal;
-    proteinsTotals = proteinsTotals + meal.proteins_goal;
-    fatsTotals = fatsTotals + meal.fats_goal;
-    const record = records.find((record) => record.meal_id === meal.id);
-
-    if (record) {
-      carbsSum = carbsSum + record.foods.reduce((sum, food) => sum + food.carbs, 0);
-      proteinsSum = proteinsSum + record.foods.reduce((sum, food) => sum + food.proteins, 0);
-      fatsSum = fatsSum + record.foods.reduce((sum, food) => sum + food.fats, 0);
-    }
-  });
-
-  return {
-    carbsTotals: carbsTotals.toFixed(1),
-    carbsSum: Math.fround(carbsSum).toFixed(1),
-    carbsRatio: getNumberOrZero(Math.round(((carbsSum / carbsTotals) * 100))),
-    proteinsTotals: proteinsTotals.toFixed(1),
-    proteinsSum: Math.fround(proteinsSum).toFixed(1),
-    proteinsRatio: getNumberOrZero(Math.round(((proteinsSum / proteinsTotals) * 100))),
-    fatsTotals: fatsTotals.toFixed(1),
-    fatsSum: Math.fround(fatsSum).toFixed(1),
-    fatsRatio: getNumberOrZero(Math.round(((fatsSum / fatsTotals) * 100))),
-  };
-}
-
-function getNumberOrZero(num: number) {
-  if (Number.isNaN(num)) return 0;
-
-  return num;
 }
