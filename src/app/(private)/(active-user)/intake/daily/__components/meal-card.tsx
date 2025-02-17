@@ -18,9 +18,9 @@ import {
 } from '@/ui';
 import { api } from '@/trpc/react';
 import type { AppRouter } from '@/server/api/root';
-import { generateGoalsAndSums, normaliseExchanges } from '../__helpers/exchanges';
+import { generateGoalsAndSums, normaliseExchanges } from '@/utils/exchanges';
+import GoalRing from '@/components/goal-ring';
 import AddMealRecord from './add-meal-record';
-import GoalRing from '@/app/(private)/(active-user)/intake/daily/__components/goal-ring';
 
 type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 

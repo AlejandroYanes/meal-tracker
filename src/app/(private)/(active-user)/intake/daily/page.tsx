@@ -7,8 +7,8 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker } from '@/ui';
 import { api } from '@/trpc/react';
 import MealCard from './__components/meal-card';
-import GoalRing from './__components/goal-ring';
-import { generateGoalsAndSums } from './__helpers/exchanges';
+import GoalRing from '@/components/goal-ring';
+import { generateGoalsAndSums } from '@/utils/exchanges';
 
 export default function IntakePage() {
   const [date, setDate] = useState(new Date());
