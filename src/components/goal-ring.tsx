@@ -29,7 +29,8 @@ export default function GoalRing(props: Props) {
 }
 
 function resolveColor(ratio: number) {
-  if (ratio > 80) return 'success';
+  if (ratio > 120) return 'fuchsia';
+  if (80 <= ratio && ratio <= 100) return 'success';
   if (30 <= ratio && ratio <= 79) return 'warning';
   if (1 <= ratio && ratio <= 29) return 'error';
   return 'neutral';

@@ -39,6 +39,7 @@ export const intakeRouter = createTRPCRouter({
           m.carbs_goal,
           m.proteins_goal,
           m.fats_goal,
+          m.is_hidden,
           COALESCE(JSON_AGG(
             CASE WHEN f.id IS NOT NULL THEN JSON_BUILD_OBJECT(
               'id', f.id,
@@ -57,9 +58,8 @@ export const intakeRouter = createTRPCRouter({
         FROM meals m
           LEFT JOIN meal_intakes mi ON mi.meal_id = m.id AND mi.for_date::DATE = ${format(input.day, 'yyyy-MM-dd')} AND mi.user_id = ${userId}
           LEFT JOIN food f ON f.id = mi.food_id
-        WHERE m.is_hidden = false
         GROUP BY m.id, m.name, m.carbs_goal, m.proteins_goal, m.fats_goal
-        ORDER BY m.name;`;
+        ORDER BY m.id;`;
       return intakeRecordsQ.rows;
     }),
 

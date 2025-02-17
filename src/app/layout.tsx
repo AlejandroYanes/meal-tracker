@@ -5,8 +5,8 @@ import { Toaster } from '@/ui';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Writer',
-  description: 'A simple writer application',
+  title: 'Meal tracker',
+  description: 'A simple meal tracker application',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 

@@ -4,11 +4,12 @@ import { useState } from 'react';
 import { addDays, addWeeks, format, startOfWeek, subWeeks } from 'date-fns';
 import { type inferRouterOutputs } from '@trpc/server';
 
-import { Skeleton, Tabs, TabsList, TabsTrigger } from '@/ui';
-import { CategoryBar } from '@/ui/category-bar';
+import { Skeleton, Tabs, TabsList, TabsTrigger, CategoryBar } from '@/ui';
 import { api } from '@/trpc/react';
 import type { AvailableChartColorsKeys } from '@/utils/charts';
+import { generateGoalsAndSums } from '@/utils/exchanges';
 import { type AppRouter } from '@/server/api/root';
+import GoalRing from '@/components/goal-ring';
 
 export default function IntakePage() {
   const [weekRef, setWeekRef] = useState('current');
@@ -50,20 +51,18 @@ export default function IntakePage() {
 
 function MealRecord(props: { date: Date }) {
   const { date } = props;
+  const formattedDate = format(date, 'yyyy-MM-dd');
+  const shortDate = format(date, 'dd MMM');
+  const today = format(new Date(), 'yyyy-MM-dd');
 
   const { data: meals = [], isLoading: isLoadingMeals } = api.meals.list.useQuery(undefined, { refetchOnMount: false });
   const { data: intakeRecords = [] } = api.intake.forDay.useQuery({ day: date });
 
-  const recordedMeals = meals.map((meal) => {
-    const record = intakeRecords.find((record) => record.meal_id === meal.id);
-    return !!record;
-  });
-
-  const goalsAndSums = generateGoalsAndSums(meals, intakeRecords);
+  const goalsAndSums = generateGoalsAndSums(intakeRecords);
 
   return (
-    <div className="bg-white p-4 rounded-md min-h-60 flex flex-col">
-      <span className="text-xl font-medium">{format(date, 'dd MMM')}</span>
+    <div data-hightlight={formattedDate === today} className="bg-white p-4 rounded-md min-h-60 flex flex-col border data-[hightlight=true]:border-purple-700">
+      <span className="text-xl font-medium">{shortDate}</span>
       {isLoadingMeals ? (
         <div className="flex flex-col gap-4 my-auto">
           <Skeleton className="w-full h-5" />
@@ -73,25 +72,13 @@ function MealRecord(props: { date: Date }) {
         </div>
       ) : null}
       {meals.length ? (
-        <div className="grid grid-cols-3 my-auto">
-          <div className="flex flex-col items-center justify-center gap-2">
-            <span className="text-3xl font-bold">{goalsAndSums.carbsSum}</span>
-            <span>{goalsAndSums.carbsTotals}</span>
-            <span>Carbs</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2">
-            <span className="text-3xl font-bold">{goalsAndSums.proteinsSum}</span>
-            <span>{goalsAndSums.proteinsTotals}</span>
-            <span>Proteins</span>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-2">
-            <span className="text-3xl font-bold">{goalsAndSums.fatsSum}</span>
-            <span>{goalsAndSums.fatsTotals}</span>
-            <span>Fats</span>
-          </div>
+        <div className="flex items-center justify-evenly my-auto">
+          <GoalRing label="Carbs" ratio={goalsAndSums.carbsRatio} sum={goalsAndSums.carbsSum} total={goalsAndSums.carbsTotals} />
+          <GoalRing label="Proteins" ratio={goalsAndSums.proteinsRatio} sum={goalsAndSums.proteinsSum} total={goalsAndSums.proteinsTotals} />
+          <GoalRing label="Fats" ratio={goalsAndSums.fatsRatio} sum={goalsAndSums.fatsSum} total={goalsAndSums.fatsTotals} />
         </div>
       ) : null}
-      {meals.length ? <MealBars meals={meals} records={recordedMeals} /> : null}
+      {meals.length ? <MealBars meals={meals} records={intakeRecords} /> : null}
     </div>
   );
 }
@@ -99,21 +86,25 @@ function MealRecord(props: { date: Date }) {
 type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
 
-function MealBars(props: { meals: Meal[]; records: boolean[] }) {
+function MealBars(props: { meals: Meal[]; records: Record[] }) {
   const { meals, records } = props;
   const count = meals.length;
 
-  const slots = Array.from({ length: count }, () => 100/count);
-  const colors = records.map((meal) => meal ? 'emerald' : 'neutral');
-
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2 *:flex-1">
-        {meals.map((meal) => (
-          <span key={meal.id} className="text-xs text-center">{meal.name}</span>
-        ))}
+      <div className="flex flex-col gap-2">
+        {meals.map((meal) => {
+          const mealRecords = records.filter((record) => record.meal_id === meal.id);
+          const goalsAndSums = generateGoalsAndSums(mealRecords);
+
+          return (
+            <div key={meal.id}>
+              <span className="text-xs text-center">{meal.name}</span>
+              <CategoryBar values={[33, 33, 33]} colors={['emerald', 'emerald', 'emerald'] as AvailableChartColorsKeys[]} />
+            </div>
+          )
+        })}
       </div>
-      <CategoryBar values={slots} colors={colors as AvailableChartColorsKeys[]} />
     </div>
   );
 }
@@ -150,33 +141,10 @@ function generateWeek(date: Date) {
   return weekArr;
 }
 
-function generateGoalsAndSums(meals: Meal[], records: Record[]) {
-  let carbsTotals = 0;
-  let carbsSum = 0;
-  let proteinsTotals = 0;
-  let proteinsSum = 0;
-  let fatsTotals = 0;
-  let fatsSum = 0;
-
-  meals.forEach((meal) => {
-    carbsTotals = carbsTotals + meal.carbs_goal;
-    proteinsTotals = proteinsTotals + meal.proteins_goal;
-    fatsTotals = fatsTotals + meal.fats_goal;
-    const record = records.find((record) => record.meal_id === meal.id);
-
-    if (record) {
-      carbsSum = carbsSum + record.foods.reduce((sum, food) => sum + food.carbs, 0);
-      proteinsSum = proteinsSum + record.foods.reduce((sum, food) => sum + food.proteins, 0);
-      fatsSum = fatsSum + record.foods.reduce((sum, food) => sum + food.fats, 0);
-    }
-  });
-
-  return {
-    carbsTotals: carbsTotals.toFixed(1),
-    carbsSum: Math.fround(carbsSum).toFixed(1),
-    proteinsTotals: proteinsTotals.toFixed(1),
-    proteinsSum: Math.fround(proteinsSum).toFixed(1),
-    fatsTotals: fatsTotals.toFixed(1),
-    fatsSum: Math.fround(fatsSum).toFixed(1),
-  };
+function resolveColor(ratio: number) {
+  if (ratio > 120) return 'fuchsia';
+  if (80 <= ratio && ratio <= 100) return 'success';
+  if (30 <= ratio && ratio <= 79) return 'warning';
+  if (1 <= ratio && ratio <= 29) return 'error';
+  return 'neutral';
 }
