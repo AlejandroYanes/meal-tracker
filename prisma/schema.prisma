@@ -75,24 +75,26 @@ model food {
 }
 
 model meals {
-  id            Int     @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   name          String
-  carbs_goal    Float   @default(0.0)
-  proteins_goal Float   @default(0.0)
-  fats_goal     Float   @default(0.0)
+  carbs_goal    Float    @default(0.0)
+  proteins_goal Float    @default(0.0)
+  fats_goal     Float    @default(0.0)
   user_id       String
-  is_hidden     Boolean @default(false)
+  is_hidden     Boolean  @default(false)
+  created_at    DateTime @default(now())
 
   @@index([user_id])
 }
 
 model meal_intakes {
-  id       Int      @id @default(autoincrement())
-  user_id  String
-  meal_id  Int
-  food_id  Int
-  amount   Float    @default(0.0)
-  for_date DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  user_id    String
+  meal_id    Int
+  food_id    Int
+  amount     Float    @default(0.0)
+  for_date   DateTime @default(now())
+  created_at DateTime @default(now())
 
   @@index([user_id])
 }
