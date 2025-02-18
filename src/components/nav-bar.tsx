@@ -47,12 +47,12 @@ export default function NavBar(props: Props) {
         <TooltipProvider>
           <Link
             className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-purple-600 text-lg font-semibold text-gray-50 md:h-8 md:w-8 md:text-base dark:bg-gray-50 dark:text-gray-900"
-            href="/intake/daily"
+            href="/intake"
           >
             <SoupIcon />
             <span className="sr-only">Meal Tracker</span>
           </Link>
-          <NavItem href="/intake/daily" icon={<CalendarDaysIcon className="h-5 w-5"/>} name="Intake records"/>
+          <NavItem href="/intake" icon={<CalendarDaysIcon className="h-5 w-5"/>} name="Intake records"/>
           <NavItem href="/meals" icon={<CookingPotIcon className="h-5 w-5"/>} name="Meals"/>
           <NavItem href="/groceries" icon={<ShoppingCartIcon className="h-5 w-5"/>} name="Groceries"/>
         </TooltipProvider>
@@ -91,7 +91,7 @@ function NavItem({ href, icon, name }: { href: string; icon: React.ReactNode; na
       <TooltipTrigger asChild>
         <Link
           data-active={pathname.startsWith(href)}
-          className="flex h-9 w-9 items-center justify-center text-gray-500 data-[active=true]:rounded-lg data-[active=true]:bg-gray-100 data-[active=true]:text-gray-900 transition-colors hover:text-gray-950 md:h-8 md:w-8 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50"
+          className="flex h-9 w-9 items-center justify-center text-gray-500 data-[active=true]:rounded-lg data-[active=true]:bg-gray-100 data-[active=true]:text-purple-900 transition-colors hover:text-gray-950 md:h-8 md:w-8 dark:bg-gray-800 dark:text-gray-50 dark:hover:text-gray-50"
           href={href}
         >
           {icon}

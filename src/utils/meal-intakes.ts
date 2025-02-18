@@ -5,7 +5,7 @@ import type { AppRouter } from '@/server/api/root';
 type Record = inferRouterOutputs<AppRouter>['intake']['forDay'][0];
 type FoodIntake = Record['foods'][0];
 
-export function generateGoalsAndSums(records: Record[]) {
+export function generateGoalsAndSums(records: Record[], date: Date) {
   let carbsTotals = 0;
   let carbsSum = 0;
   let proteinsTotals = 0;
@@ -13,7 +13,12 @@ export function generateGoalsAndSums(records: Record[]) {
   let fatsTotals = 0;
   let fatsSum = 0;
 
+  const mealsOfDay = resolveMeals(records, date);
+
   records.forEach((meal) => {
+    const isUsable = mealsOfDay.some((_meal) => _meal.id === meal.meal_id);
+    if (!isUsable) return;
+
     carbsTotals = carbsTotals + meal.carbs_goal;
     proteinsTotals = proteinsTotals + meal.proteins_goal;
     fatsTotals = fatsTotals + meal.fats_goal;
@@ -71,5 +76,26 @@ export function normaliseExchanges(food: FoodIntake) {
     proteins: exchanges.proteins.toFixed(1),
     fats: exchanges.fats.toFixed(1),
   }
+}
+
+export function resolveMeals(records: Record[], date: Date) {
+  const meals: { id: number; name: string; order: number }[] = [];
+
+  records.forEach((record) => {
+    const exists = meals.some(meal => meal.id === record.meal_id);
+
+    if (!exists) {
+      const wasCreatedAfterDate = date > record.created_at;
+      if (!wasCreatedAfterDate) return;
+
+      const wasHiddenBeforeDate = record.is_hidden && record.hidden_at && date > record.hidden_at;
+      if (wasHiddenBeforeDate) return;
+
+      meals.push({ id: record.meal_id, name: record.meal_name, order: record.order });
+    }
+  });
+
+  meals.sort((a, b) => a.order - b.order);
+  return meals;
 }
 

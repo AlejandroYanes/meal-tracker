@@ -58,31 +58,35 @@ model verification_tokens {
 }
 
 model food {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   name        String
   description String
   notes       String
   amount      Float
   unit        String
-  carbs       Float   @default(0.0)
-  proteins    Float   @default(0.0)
-  fats        Float   @default(0.0)
-  price       Float   @default(0.0)
+  carbs       Float     @default(0.0)
+  proteins    Float     @default(0.0)
+  fats        Float     @default(0.0)
+  price       Float     @default(0.0)
   user_id     String
-  is_hidden   Boolean @default(false)
+  is_hidden   Boolean   @default(false)
+  created_at  DateTime  @default(now())
+  hidden_at   DateTime?
 
   @@index([user_id])
 }
 
 model meals {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   name          String
-  carbs_goal    Float    @default(0.0)
-  proteins_goal Float    @default(0.0)
-  fats_goal     Float    @default(0.0)
+  carbs_goal    Float     @default(0.0)
+  proteins_goal Float     @default(0.0)
+  fats_goal     Float     @default(0.0)
   user_id       String
-  is_hidden     Boolean  @default(false)
-  created_at    DateTime @default(now())
+  order         Int       @default(autoincrement())
+  is_hidden     Boolean   @default(false)
+  created_at    DateTime  @default(now())
+  hidden_at     DateTime?
 
   @@index([user_id])
 }

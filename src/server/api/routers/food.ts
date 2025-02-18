@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { format } from 'date-fns';
 import { sql } from '@vercel/postgres';
 
 import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
@@ -42,7 +43,8 @@ export const foodRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
 
-      const [insertQ, insertP] = tql.query`INSERT INTO food ${tql.VALUES({ ...input, user_id: userId })}`;
+      const [insertQ, insertP] = tql.query`
+        INSERT INTO food ${tql.VALUES({ ...input, user_id: userId })}`;
       await sql.query(insertQ, insertP);
 
       return insertQ;
@@ -81,8 +83,11 @@ export const foodRouter = createTRPCRouter({
     }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
+      const today = new Date();
 
-      await sql`UPDATE food SET is_hidden = true WHERE user_id = ${userId} AND id = ${input.id}`;
+      await sql`
+        UPDATE food SET is_hidden = true, hidden_at = ${format(today, 'yyyy-MM-dd')}
+        WHERE user_id = ${userId} AND id = ${input.id}`;
       return true;
     }),
 });

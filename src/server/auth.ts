@@ -46,7 +46,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/landing',
+    signIn: '/intake',
     verifyRequest: '/verify-email',
     error: '/?sign-in-error=true',
     newUser: '/onboarding',

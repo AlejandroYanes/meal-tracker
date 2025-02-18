@@ -22,11 +22,10 @@ import {
 import { api } from '@/trpc/react';
 import type { AppRouter } from '@/server/api/root';
 
-type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 type Food = inferRouterOutputs<AppRouter>['food']['list'][0];
 
 interface Props {
-  meal: Meal;
+  meal: { id: number; name: string };
   day: Date;
   onClose: () => void;
 }

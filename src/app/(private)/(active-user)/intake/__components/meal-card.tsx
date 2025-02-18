@@ -1,6 +1,5 @@
 'use client';
 import { useState } from 'react';
-import type { inferRouterOutputs } from '@trpc/server';
 import { NotebookPenIcon } from 'lucide-react';
 
 import {
@@ -17,16 +16,13 @@ import {
   TableRow,
 } from '@/ui';
 import { api } from '@/trpc/react';
-import type { AppRouter } from '@/server/api/root';
-import { generateGoalsAndSums, normaliseExchanges } from '@/utils/exchanges';
+import { generateGoalsAndSums, normaliseExchanges } from '@/utils/meal-intakes';
 import GoalRing from '@/components/goal-ring';
 import AddMealRecord from './add-meal-record';
 
-type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
-
 interface Props {
   day: Date;
-  meal: Meal;
+  meal: { id: number; name: string };
 }
 
 export default function MealCard(props: Props) {
@@ -39,7 +35,7 @@ export default function MealCard(props: Props) {
   const foodRecords = recordsForMeal?.foods ?? [];
 
   const goalsAndSums = recordsForMeal
-    ? generateGoalsAndSums([recordsForMeal])
+    ? generateGoalsAndSums([recordsForMeal], day)
     : {
       carbsTotals: '0',
       carbsSum: '0',
@@ -93,7 +89,7 @@ export default function MealCard(props: Props) {
             {isLoading ? <SkeletonRows /> : null}
             {!isLoading && foodRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center py-6">
+                <TableCell colSpan={5} className="text-center">
                   No records yet...
                 </TableCell>
               </TableRow>

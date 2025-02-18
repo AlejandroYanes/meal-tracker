@@ -7,7 +7,7 @@ export default async function Home() {
   const session = await getServerAuthSession();
 
   if (session?.user) {
-    redirect('/intake/daily');
+    redirect('/intake');
   }
 
   return (
