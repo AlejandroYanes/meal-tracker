@@ -16,11 +16,13 @@ export const mealsRouter = createTRPCRouter({
         carbs_goal: number;
         proteins_goal: number;
         fats_goal: number;
+        position: number;
       }>`
-        SELECT id, name, carbs_goal, proteins_goal, fats_goal
+        SELECT id, name, carbs_goal, proteins_goal, fats_goal, position
         FROM meals
         WHERE user_id = ${userId}
-          AND is_hidden = false`;
+          AND is_hidden = false
+        ORDER BY position DESC`;
       return mealsQ.rows;
     }),
 
@@ -59,6 +61,32 @@ export const mealsRouter = createTRPCRouter({
           AND is_hidden = false`;
       await sql.query(updateQ, updateP);
       return true;
+    }),
+
+  updateOrder: protectedProcedure
+    .input(z.object({
+      from: z.object({
+        id: z.number(),
+        position: z.number(),
+      }),
+      to: z.object({
+        id: z.number(),
+        position: z.number(),
+      })
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+      const client = await sql.connect();
+
+      try {
+        await client.sql`UPDATE meals SET position = ${input.to.position} WHERE id = ${input.from.id} AND user_id = ${userId}`;
+        await client.sql`UPDATE meals SET position = ${input.from.position} WHERE id = ${input.to.id} AND user_id = ${userId}`;
+        return true;
+      } catch (e) {
+        throw e;
+      } finally {
+        client.release();
+      }
     }),
 
   remove: protectedProcedure

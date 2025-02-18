@@ -19,7 +19,7 @@ export const intakeRouter = createTRPCRouter({
         carbs_goal: number;
         proteins_goal: number;
         fats_goal: number;
-        order: number;
+        position: number;
         is_hidden: boolean;
         hidden_at: Date | null;
         created_at: Date;
@@ -47,7 +47,7 @@ export const intakeRouter = createTRPCRouter({
           m.carbs_goal,
           m.proteins_goal,
           m.fats_goal,
-          m.order,
+          m.position,
           m.is_hidden,
           m.hidden_at,
           m.created_at,

@@ -79,7 +79,7 @@ export function normaliseExchanges(food: FoodIntake) {
 }
 
 export function resolveMeals(records: Record[], date: Date) {
-  const meals: { id: number; name: string; order: number }[] = [];
+  const meals: { id: number; name: string; position: number }[] = [];
 
   records.forEach((record) => {
     const exists = meals.some(meal => meal.id === record.meal_id);
@@ -91,11 +91,11 @@ export function resolveMeals(records: Record[], date: Date) {
       const wasHiddenBeforeDate = record.is_hidden && record.hidden_at && date > record.hidden_at;
       if (wasHiddenBeforeDate) return;
 
-      meals.push({ id: record.meal_id, name: record.meal_name, order: record.order });
+      meals.push({ id: record.meal_id, name: record.meal_name, position: record.position });
     }
   });
 
-  meals.sort((a, b) => a.order - b.order);
+  meals.sort((a, b) => a.position - b.position);
   return meals;
 }
 

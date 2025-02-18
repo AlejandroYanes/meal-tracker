@@ -83,7 +83,7 @@ model meals {
   proteins_goal Float     @default(0.0)
   fats_goal     Float     @default(0.0)
   user_id       String
-  order         Int       @default(autoincrement())
+  position      Int       @default(autoincrement())
   is_hidden     Boolean   @default(false)
   created_at    DateTime  @default(now())
   hidden_at     DateTime?
