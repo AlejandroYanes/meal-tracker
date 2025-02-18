@@ -25,6 +25,7 @@ export const intakeRouter = createTRPCRouter({
         created_at: Date;
         foods: {
           id: number;
+          food_id: number;
           name: string;
           description: string;
           notes: string;
@@ -52,7 +53,8 @@ export const intakeRouter = createTRPCRouter({
           m.created_at,
           COALESCE(JSON_AGG(
             CASE WHEN f.id IS NOT NULL THEN JSON_BUILD_OBJECT(
-              'id', f.id,
+              'id', mi.id,
+              'food_id', f.id,
               'name', f.name,
               'description', f.description,
               'notes', f.notes,
@@ -92,6 +94,34 @@ export const intakeRouter = createTRPCRouter({
         INSERT INTO meal_intakes ${tql.VALUES({ ...input, for_date: input.for_date.toDateString(), user_id: userId })}`;
       await sql.query(insertQ, insertP);
 
+      return true;
+    }),
+
+  update: protectedProcedure
+    .input(z.object({
+      intake_id: z.number(),
+      food_id: z.number({ required_error: 'Please select a food item' }),
+      amount: z.number().min(0, 'Please enter an amount'),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const [insertQ, insertP] = tql.query`
+        UPDATE meal_intakes ${tql.SET({ food_id: input.food_id, amount: input.amount })}
+        WHERE id = ${input.intake_id} AND user_id = ${userId}`;
+      await sql.query(insertQ, insertP);
+
+      return true;
+    }),
+
+  remove: protectedProcedure
+    .input(z.object({
+      id: z.number(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      await sql`DELETE FROM meal_intakes WHERE id = ${input.id} AND user_id = ${userId}`;
       return true;
     }),
 });

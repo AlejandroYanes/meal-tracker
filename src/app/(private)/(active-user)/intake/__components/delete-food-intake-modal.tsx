@@ -1,6 +1,5 @@
 'use client';
 import { useEffect } from 'react';
-import type { inferRouterOutputs } from '@trpc/server';
 
 import {
   AlertDialog,
@@ -12,31 +11,30 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   Loader,
-  RenderIf, useToast,
+  RenderIf,
+  useToast,
 } from '@/ui';
 import { api } from '@/trpc/react';
-import type { AppRouter } from '@/server/api/root';
-
-type Meal = inferRouterOutputs<AppRouter>['meals']['list'][0];
 
 interface Props {
-  meal: Meal;
+  itemId: number;
+  day: Date;
   onClose: () => void;
 }
 
-export default function DeleteMealModal(props: Props) {
-  const { meal, onClose } = props;
+export default function DeleteFoodIntakeModal(props: Props) {
+  const { itemId, day, onClose } = props;
 
   const { toast } = useToast();
   const utils = api.useUtils();
-  const { mutate: removeMeal, isPending } = api.meals.remove.useMutation({
+  const { mutate: removeRecord, isPending } = api.intake.remove.useMutation({
     onSuccess: () => {
-      void utils.meals.list.invalidate();
+      void utils.intake.forDay.invalidate({ day });
       onClose();
     },
     onError: (error) => {
       toast({
-        title: 'Failed to delete the meal item',
+        title: 'Failed to delete the food intake record',
         description: error.message,
         variant: 'destructive',
       })
@@ -55,9 +53,9 @@ export default function DeleteMealModal(props: Props) {
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            {/* eslint-disable-next-line react/no-unescaped-entities */}
-            The <strong>"{meal.name}"</strong> item will not be deleted as it might have been used already,
-            but you will not be able to use it in the future.
+            If the food item you are about to remove was previously,{' '}
+            then we are only showing it for a historic record purpose,{' '}
+            if you <strong>remove</strong> it you will not be able to add it again.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -65,7 +63,7 @@ export default function DeleteMealModal(props: Props) {
           <AlertDialogAction
             variant="destructive"
             disabled={isPending}
-            onClick={() => removeMeal({ id: meal.id })}
+            onClick={() => removeRecord({ id: itemId })}
           >
             <RenderIf condition={isPending}>
               <Loader color="white" size="xs" className="mr-2"/>

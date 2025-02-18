@@ -1,13 +1,18 @@
 'use client';
 import { useState } from 'react';
-import { NotebookPenIcon } from 'lucide-react';
+import { EllipsisVerticalIcon, NotebookPenIcon, PencilLineIcon, Trash2Icon } from 'lucide-react';
 
 import {
   Button,
   Card,
   CardContent,
   CardHeader,
-  CardTitle, Skeleton,
+  CardTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Skeleton,
   Table,
   TableBody,
   TableCell,
@@ -18,7 +23,8 @@ import {
 import { api } from '@/trpc/react';
 import { generateGoalsAndSums, normaliseExchanges } from '@/utils/meal-intakes';
 import GoalRing from '@/components/goal-ring';
-import AddMealRecord from './add-meal-record';
+import FoodIntakeModal from './food-intake-modal';
+import DeleteFoodIntakeModal from '@/app/(private)/(active-user)/intake/__components/delete-food-intake-modal';
 
 interface Props {
   day: Date;
@@ -28,6 +34,8 @@ interface Props {
 export default function MealCard(props: Props) {
   const { day, meal } = props;
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingFoodIntake, setEditingFoodIntake] = useState<{ id: number; food_id: number; amount: number } | null>(null);
+  const [deletingFoodIntake, setDeletingFoodIntake] = useState<number | null>(null);
 
   const { data: intakeRecords = [], isLoading } = api.intake.forDay.useQuery({ day }, { refetchOnMount: false });
 
@@ -53,9 +61,24 @@ export default function MealCard(props: Props) {
       <CardHeader className="space-y-0 flex flex-row items-center justify-between">
         <CardTitle className="text-lg font-medium">{meal.name}</CardTitle>
         <div className="flex items-center gap-4">
-          <GoalRing label="Carbs" ratio={goalsAndSums.carbsRatio} sum={goalsAndSums.carbsSum} total={goalsAndSums.carbsTotals} />
-          <GoalRing label="Proteins" ratio={goalsAndSums.proteinsRatio} sum={goalsAndSums.proteinsSum} total={goalsAndSums.proteinsTotals} />
-          <GoalRing label="Fats" ratio={goalsAndSums.fatsRatio} sum={goalsAndSums.fatsSum} total={goalsAndSums.fatsTotals} />
+          <GoalRing
+            label="Carbs"
+            ratio={goalsAndSums.carbsRatio}
+            sum={goalsAndSums.carbsSum}
+            total={goalsAndSums.carbsTotals}
+          />
+          <GoalRing
+            label="Proteins"
+            ratio={goalsAndSums.proteinsRatio}
+            sum={goalsAndSums.proteinsSum}
+            total={goalsAndSums.proteinsTotals}
+          />
+          <GoalRing
+            label="Fats"
+            ratio={goalsAndSums.fatsRatio}
+            sum={goalsAndSums.fatsSum}
+            total={goalsAndSums.fatsTotals}
+          />
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
@@ -71,25 +94,57 @@ export default function MealCard(props: Props) {
               <TableHead className="w-28 text-center">Carbs</TableHead>
               <TableHead className="w-28 text-center">Proteins</TableHead>
               <TableHead className="w-28 text-center">Fats</TableHead>
+              <TableHead className="w-20">
+                <span className="sr-only">Actions</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {foodRecords.map((food) => {
-              const { carbs, proteins, fats } = normaliseExchanges(food);
+            {foodRecords.map((record) => {
+              const { carbs, proteins, fats } = normaliseExchanges(record);
               return (
-                <TableRow key={food.id}>
-                  <TableCell>{food.name}</TableCell>
-                  <TableCell className="w-28 text-center">{food.amount_consumed}{food.unit === 'piece' ? ` ${food.unit}` : food.unit}</TableCell>
+                <TableRow key={record.id}>
+                  <TableCell>{record.name}</TableCell>
+                  <TableCell className="w-28 text-center">
+                    {record.amount_consumed}{record.unit === 'piece' ? ` ${record.unit}` : record.unit}
+                  </TableCell>
                   <TableCell className="w-28 text-center">{carbs}</TableCell>
                   <TableCell className="w-28 text-center">{proteins}</TableCell>
                   <TableCell className="w-28 text-center">{fats}</TableCell>
+                  <TableCell className="w-20">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="mx-auto">
+                          <EllipsisVerticalIcon className="h-4 w-4 mr-2" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40" side="bottom" align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditingFoodIntake({
+                              id: record.id,
+                              food_id: record.food_id,
+                              amount: record.amount_consumed,
+                            });
+                          }}
+                        >
+                          <PencilLineIcon className="w-4 h-4 mr-2" />
+                          <span>Edit</span>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setDeletingFoodIntake(record.id)}>
+                          <Trash2Icon className="w-4 h-4 mr-2" />
+                          <span>Remove</span>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
                 </TableRow>
               )
             })}
             {isLoading ? <SkeletonRows /> : null}
             {!isLoading && foodRecords.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell colSpan={6} className="text-center">
                   No records yet...
                 </TableCell>
               </TableRow>
@@ -97,7 +152,19 @@ export default function MealCard(props: Props) {
           </TableBody>
         </Table>
         {showAddModal ? (
-          <AddMealRecord meal={meal} day={day} onClose={() => setShowAddModal(false)} />
+          <FoodIntakeModal meal={meal} day={day} onClose={() => setShowAddModal(false)} />
+        ) : null}
+        {editingFoodIntake ? (
+          <FoodIntakeModal
+            meal={meal}
+            day={day}
+            itemId={editingFoodIntake.id}
+            initialValues={{ food_id: editingFoodIntake.food_id, amount: editingFoodIntake.amount }}
+            onClose={() => setEditingFoodIntake(null)}
+          />
+        ) : null}
+        {deletingFoodIntake ? (
+          <DeleteFoodIntakeModal itemId={deletingFoodIntake} day={day} onClose={() => setDeletingFoodIntake(null)} />
         ) : null}
       </CardContent>
     </Card>

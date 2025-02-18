@@ -27,6 +27,8 @@ type Food = inferRouterOutputs<AppRouter>['food']['list'][0];
 interface Props {
   meal: { id: number; name: string };
   day: Date;
+  itemId?: number;
+  initialValues?: FoodIntake;
   onClose: () => void;
 }
 
@@ -36,11 +38,11 @@ const foodIntakeSchema = z.object({
 });
 type FoodIntake = z.infer<typeof foodIntakeSchema>;
 
-export default function AddMealRecord(props: Props) {
-  const { meal, day, onClose } = props;
+export default function FoodIntakeModal(props: Props) {
+  const { meal, day, initialValues, itemId, onClose } = props;
 
   const form = useForm<FoodIntake>({
-    defaultValues: {
+    defaultValues: initialValues ?? {
       food_id: -1,
       amount: 0,
     },
@@ -52,16 +54,27 @@ export default function AddMealRecord(props: Props) {
   const selectedFood = foods.find(food => selectedFoodId === food.id);
 
   const utils = api.useUtils();
-  const { mutate: recordIntake, isPending, error } = api.intake.add.useMutation({
+  const { mutate: recordIntake, isPending: isCreating, error: createError } = api.intake.add.useMutation({
     onSuccess: () => {
       void utils.intake.forDay.invalidate({ day });
       onClose();
     },
   });
-  const errorMessage = error?.message;
+  const { mutate: updateRecord, isPending: isUpdating, error: updateError } = api.intake.update.useMutation({
+    onSuccess: () => {
+      void utils.intake.forDay.invalidate({ day });
+      onClose();
+    },
+  });
+  const isPending = isCreating || isUpdating;
+  const errorMessage = createError?.message ?? updateError?.message;
 
   const handleSubmit = form.handleSubmit((values) => {
-    recordIntake({ ...values, meal_id: meal.id, for_date: day });
+    if (itemId) {
+      updateRecord({ intake_id: itemId, amount: values.amount, food_id: values.food_id });
+    } else {
+      recordIntake({ ...values, meal_id: meal.id, for_date: day });
+    }
   });
 
   return (
@@ -128,7 +141,7 @@ export default function AddMealRecord(props: Props) {
           <DialogFooter className="pt-6">
             <Button className="px-8" disabled={isPending}>
               {isPending ? <Loader size="icon" color="white" className="mr-2" /> : null}
-              Add
+              {itemId ? 'Update' : 'Add'}
             </Button>
           </DialogFooter>
         </form>
