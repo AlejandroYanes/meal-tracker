@@ -36,9 +36,9 @@ export const foodRouter = createTRPCRouter({
       amount: z.number().min(1, 'Please add an amount'),
       unit: z.string().min(1, 'Please add a unit'),
       price: z.number(),
-      carbs: z.number().min(0).max(1),
-      proteins: z.number().min(0).max(1),
-      fats: z.number().min(0).max(1),
+      carbs: z.number().min(0),
+      proteins: z.number().min(0),
+      fats: z.number().min(0),
     }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
@@ -59,9 +59,9 @@ export const foodRouter = createTRPCRouter({
       amount: z.number().min(1, 'Please add an amount'),
       unit: z.string().min(1, 'Please add a unit'),
       price: z.number(),
-      carbs: z.number().min(0).max(1),
-      proteins: z.number().min(0).max(1),
-      fats: z.number().min(0).max(1),
+      carbs: z.number().min(0),
+      proteins: z.number().min(0),
+      fats: z.number().min(0),
     }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;

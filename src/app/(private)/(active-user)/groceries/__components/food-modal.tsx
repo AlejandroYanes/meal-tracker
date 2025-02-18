@@ -76,11 +76,17 @@ export default function FoodModal(props: Props) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="w-[700px]">
+      <DialogContent className="w-[700px] max-h-[calc(100vh_-_5%)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add food</DialogTitle>
           <DialogDescription>
-            Add the details of the food so you can track it later on.
+            {isEditing ? (
+              <>
+                Updating the numeral values will affect the accounting for the days where this food item was used.
+                <br />
+                If you no no longer want to follow these values, we advice you remove this item and create a new one.
+              </>
+            ) : 'Add the details of the food so you can track it later on.'}
           </DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-6 pt-6" onSubmit={handleSubmit}>
@@ -230,7 +236,7 @@ export default function FoodModal(props: Props) {
           {errorMessage ? (
             <span className="text-red-500 text-sm font-medium">{errorMessage}</span>
           ) : null}
-          <DialogFooter className="pt-6">
+          <DialogFooter className="pt-6 sticky bottom-0 bg-white">
             <Button className="px-6" disabled={isPending}>
               {isPending ? <Loader color="white" size="icon" /> : null}
               Save

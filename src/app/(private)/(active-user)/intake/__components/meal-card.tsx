@@ -10,7 +10,7 @@ import {
   CardTitle,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuItem, DropdownMenuLabel,
   DropdownMenuTrigger,
   Skeleton,
   Table,
@@ -119,6 +119,7 @@ export default function MealCard(props: Props) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-40" side="bottom" align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
                           onClick={() => {
                             setEditingFoodIntake({

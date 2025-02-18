@@ -27,9 +27,9 @@ export const mealsRouter = createTRPCRouter({
   add: protectedProcedure
     .input(z.object({
       name: z.string(),
-      carbs_goal: z.number().min(0).max(1),
-      proteins_goal: z.number().min(0).max(1),
-      fats_goal: z.number().min(0).max(1),
+      carbs_goal: z.number().min(0),
+      proteins_goal: z.number().min(0),
+      fats_goal: z.number().min(0),
     }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
@@ -44,9 +44,9 @@ export const mealsRouter = createTRPCRouter({
     .input(z.object({
       id: z.number(),
       name: z.string(),
-      carbs_goal: z.number().min(0).max(1),
-      proteins_goal: z.number().min(0).max(1),
-      fats_goal: z.number().min(0).max(1),
+      carbs_goal: z.number().min(0),
+      proteins_goal: z.number().min(0),
+      fats_goal: z.number().min(0),
     }))
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;

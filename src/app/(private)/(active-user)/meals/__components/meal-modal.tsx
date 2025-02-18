@@ -68,7 +68,15 @@ export default function MealModal(props: Props) {
         <DialogHeader>
           <DialogTitle>Add meal</DialogTitle>
           <DialogDescription>
-            Add the details of the meal so you can track it later on.
+            {isEditing
+              ? (
+                <>
+                  Updating the exchange goals will affect the accounting for the days where this meal was used.
+                  <br />
+                  If you no no longer want to follow these values, we advice you remove this meal and create a new one.
+                </>
+              )
+              : 'Add the details of the meal so you can track it later on.'}
           </DialogDescription>
         </DialogHeader>
         <form className="flex flex-col gap-6 pt-6" onSubmit={handleSubmit}>
@@ -95,7 +103,6 @@ export default function MealModal(props: Props) {
                   type="number"
                   step={0.01}
                   min={0}
-                  max={1}
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   error={!!formState.errors.carbs_goal}
@@ -112,7 +119,6 @@ export default function MealModal(props: Props) {
                   type="number"
                   step={0.01}
                   min={0}
-                  max={1}
                   {...field}
                   value={field.value ?? 0}
                   onChange={(e) => field.onChange(Number(e.target.value))}
@@ -130,7 +136,6 @@ export default function MealModal(props: Props) {
                   type="number"
                   step={0.01}
                   min={0}
-                  max={1}
                   {...field}
                   value={field.value ?? 0}
                   onChange={(e) => field.onChange(Number(e.target.value))}
