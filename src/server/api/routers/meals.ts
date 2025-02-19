@@ -22,7 +22,7 @@ export const mealsRouter = createTRPCRouter({
         FROM meals
         WHERE user_id = ${userId}
           AND is_hidden = false
-        ORDER BY position DESC`;
+        ORDER BY position`;
       return mealsQ.rows;
     }),
 
