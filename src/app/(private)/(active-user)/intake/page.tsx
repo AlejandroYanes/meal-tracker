@@ -16,8 +16,6 @@ export default function IntakePage() {
   const { data: records = [], isLoading } = api.intake.forDay.useQuery({ day: date });
   const meals = resolveMeals(records, date);
 
-  console.log('meals', meals);
-
   const goalsAndSums = generateGoalsAndSums(records, date);
 
   const goToPrevDay = () => {

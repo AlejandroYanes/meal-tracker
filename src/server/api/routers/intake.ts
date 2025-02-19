@@ -77,7 +77,7 @@ export const intakeRouter = createTRPCRouter({
           LEFT JOIN food f ON f.id = mi.food_id
         WHERE m.user_id = ${userId}
         GROUP BY m.id, m.name, m.carbs_goal, m.proteins_goal, m.fats_goal
-        ORDER BY m.id;`;
+        ORDER BY m.order;`;
       return intakeRecordsQ.rows;
     }),
 
