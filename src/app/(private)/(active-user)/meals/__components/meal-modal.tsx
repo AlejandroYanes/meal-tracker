@@ -17,9 +17,9 @@ import {
 
 const mealSchema = z.object({
   name: z.string(),
-  carbs_goal: z.number().min(0).max(1),
-  proteins_goal: z.number().min(0).max(1),
-  fats_goal: z.number().min(0).max(1),
+  carbs_goal: z.number().min(0),
+  proteins_goal: z.number().min(0),
+  fats_goal: z.number().min(0),
 });
 export type MealInput = z.infer<typeof mealSchema>;
 

@@ -99,7 +99,7 @@ export default function OnboardingPage() {
                 disabled={isPending}
                 control={form.control}
                 render={({ field, formState }) => (
-                  <InputWithLabel required label="Carbs" className="w-20" type="number" step={0.1} min={0} max={1} {...field} onChange={(e) => field.onChange(Number(e.target.value))} error={!!formState.errors.carbs} />
+                  <InputWithLabel required label="Carbs" className="w-20" type="number" step={0.1} min={0} {...field} onChange={(e) => field.onChange(Number(e.target.value))} error={!!formState.errors.carbs} />
                 )}
               />
               <Controller
@@ -107,7 +107,7 @@ export default function OnboardingPage() {
                 disabled={isPending}
                 control={form.control}
                 render={({ field, formState }) => (
-                  <InputWithLabel required label="Proteins" className="w-28" type="number" step={0.1} min={0} max={1} {...field} value={field.value ?? 0} onChange={(e) => field.onChange(Number(e.target.value))} error={!!formState.errors.proteins} />
+                  <InputWithLabel required label="Proteins" className="w-28" type="number" step={0.1} min={0} {...field} value={field.value ?? 0} onChange={(e) => field.onChange(Number(e.target.value))} error={!!formState.errors.proteins} />
                 )}
               />
               <Controller
@@ -115,7 +115,7 @@ export default function OnboardingPage() {
                 disabled={isPending}
                 control={form.control}
                 render={({ field, formState }) => (
-                  <InputWithLabel required  label="Fats" className="w-20" type="number" step={0.1} min={0} max={1} {...field} value={field.value ?? 0} onChange={(e) => field.onChange(Number(e.target.value))} error={!!formState.errors.fats} />
+                  <InputWithLabel required  label="Fats" className="w-20" type="number" step={0.1} min={0} {...field} value={field.value ?? 0} onChange={(e) => field.onChange(Number(e.target.value))} error={!!formState.errors.fats} />
                 )}
               />
               <Button variant="black" disabled={isPending}>Add meal</Button>
