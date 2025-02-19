@@ -75,6 +75,9 @@ export default function OnboardingPage() {
           </CardTitle>
           <CardDescription className="leading-6">
             First things first, we need to set you up, add below how many meals do you want to track.
+            <br />
+            Eg: Breakfast, Lunch, Dinner...
+            <br />
             When you are done, go to the bottom of the page and click the{' '}
             <Code className="text-primary font-bold">Continue</Code> button.
           </CardDescription>
