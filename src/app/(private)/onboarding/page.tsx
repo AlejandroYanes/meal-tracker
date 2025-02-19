@@ -27,9 +27,9 @@ import { api } from '@/trpc/react';
 
 const mealsSchema = z.object({
   name: z.string(),
-  carbs: z.number().min(0).max(1),
-  proteins: z.number().min(0).max(1),
-  fats: z.number().min(0).max(1),
+  carbs: z.number().min(0),
+  proteins: z.number().min(0),
+  fats: z.number().min(0),
 });
 
 type Meal = z.infer<typeof mealsSchema>;
