@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
 import {
-  ChevronDownIcon, ChevronsDownIcon,
+  ChevronDownIcon,
+  ChevronsDownIcon,
   ChevronsUpIcon,
   ChevronUpIcon,
   EllipsisVerticalIcon,
@@ -20,7 +21,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Skeleton,
   Table,
