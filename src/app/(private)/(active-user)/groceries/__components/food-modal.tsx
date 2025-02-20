@@ -29,9 +29,9 @@ const foodSchema = z.object({
   amount: z.number().min(1, 'Please add an amount'),
   unit: z.string().min(1, 'Please add a unit'),
   price: z.number(),
-  carbs: z.number().min(0).max(1),
-  proteins: z.number().min(0).max(1),
-  fats: z.number().min(0).max(1),
+  carbs: z.number().min(0),
+  proteins: z.number().min(0),
+  fats: z.number().min(0),
 });
 export type FoodInput = z.infer<typeof foodSchema>;
 
@@ -189,7 +189,6 @@ export default function FoodModal(props: Props) {
                   type="number"
                   step={0.01}
                   min={0}
-                  max={1}
                   {...field}
                   onChange={(e) => field.onChange(Number(e.target.value))}
                   error={!!formState.errors.carbs}
@@ -206,7 +205,6 @@ export default function FoodModal(props: Props) {
                   type="number"
                   step={0.01}
                   min={0}
-                  max={1}
                   {...field}
                   value={field.value ?? 0}
                   onChange={(e) => field.onChange(Number(e.target.value))}
@@ -224,7 +222,6 @@ export default function FoodModal(props: Props) {
                   type="number"
                   step={0.01}
                   min={0}
-                  max={1}
                   {...field}
                   value={field.value ?? 0}
                   onChange={(e) => field.onChange(Number(e.target.value))}
