@@ -6,9 +6,10 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 
 import { Button, Card, CardContent, CardHeader, CardTitle, DatePicker, Skeleton } from '@/ui';
 import { api } from '@/trpc/react';
-import MealCard from './__components/meal-card';
-import GoalRing from '@/components/goal-ring';
 import { generateGoalsAndSums, resolveMeals } from '@/utils/meal-intakes';
+import GoalRing from '@/components/goal-ring';
+import MealCard from './__components/meal-card';
+import CopyFromDay from './__components/copy-from-day';
 
 export default function IntakePage() {
   const [date, setDate] = useState(new Date());
@@ -49,6 +50,7 @@ export default function IntakePage() {
             <Button variant="outline" size="icon" onClick={goToNextDay}>
               <ChevronRightIcon className="w-4 h-4" />
             </Button>
+            <CopyFromDay day={date} />
           </div>
           <div className="flex items-center gap-4">
             <GoalRing label="Carbs" ratio={goalsAndSums.carbsRatio} sum={goalsAndSums.carbsSum} total={goalsAndSums.carbsTotals} />

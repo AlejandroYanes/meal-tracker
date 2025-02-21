@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { format } from 'date-fns';
 import { sql } from '@vercel/postgres';
+import { TRPCError } from '@trpc/server';
 
-import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
 import { tql } from '@/utils/tql';
+import { createTRPCRouter, protectedProcedure } from '@/server/api/trpc';
 
 export const intakeRouter = createTRPCRouter({
   forDay: protectedProcedure
@@ -93,6 +94,40 @@ export const intakeRouter = createTRPCRouter({
 
       const [insertQ, insertP] = tql.query`
         INSERT INTO meal_intakes ${tql.VALUES({ ...input, for_date: input.for_date.toDateString(), user_id: userId })}`;
+      await sql.query(insertQ, insertP);
+
+      return true;
+    }),
+
+  duplicate: protectedProcedure
+    .input(z.object({
+      from_day: z.date(),
+      to_day: z.date(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const recordsQ = await sql<{ meal_id: number; food_id: number; amount: number }>`
+        SELECT meal_id, food_id, amount
+        FROM meal_intakes
+        WHERE for_date::DATE = ${format(input.from_day, 'yyyy-MM-dd')} AND user_id = ${userId}`;
+
+      const records = recordsQ.rows;
+
+      if (!records.length) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: `No meals found on ${format(input.from_day, 'dd MMMM')}`,
+        });
+      }
+
+      const newRecords = records.map(record => ({
+        ...record,
+        user_id: userId,
+        for_date: input.to_day.toDateString(),
+      }));
+
+      const [insertQ, insertP] = tql.query`INSERT INTO meal_intakes ${tql.VALUES(newRecords)}`;
       await sql.query(insertQ, insertP);
 
       return true;
