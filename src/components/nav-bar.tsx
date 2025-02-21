@@ -2,31 +2,10 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
 import type { Session } from 'next-auth';
-import {
-  CalendarDaysIcon,
-  CookingPotIcon,
-  HeadsetIcon,
-  LogOutIcon,
-  ShoppingCartIcon,
-  SoupIcon,
-  UserIcon,
-} from 'lucide-react';
+import { CalendarDaysIcon, CookingPotIcon, ShoppingCartIcon, SoupIcon } from 'lucide-react';
 
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/ui';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui';
 
 interface Props {
   session: Session;
@@ -39,14 +18,12 @@ export default function NavBar(props: Props) {
     return null;
   }
 
-  const { user } = session;
-
   return (
-    <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 flex-col border-r border-neutral-200 bg-white sm:flex dark:bg-gray-950">
-      <nav className="flex flex-col items-center gap-4 px-2 sm:py-5">
+    <aside className="fixed inset-x-0 bottom-0 md:inset-y-0 md:left-0 z-10 w-full md:w-14 py-4 md:py-0 flex flex-row md:flex-col border-t md:border-r border-neutral-200 bg-white dark:bg-gray-950">
+      <nav className="flex md:flex-col justify-evenly md:justify-start items-center flex-1 gap-4 px-2 sm:py-5">
         <TooltipProvider>
           <Link
-            className="group flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-purple-600 text-lg font-semibold text-gray-50 md:h-8 md:w-8 md:text-base dark:bg-gray-50 dark:text-gray-900"
+            className="hidden group md:flex h-9 w-9 shrink-0 items-center justify-center gap-2 rounded-lg bg-purple-600 text-lg font-semibold text-gray-50 md:h-8 md:w-8 md:text-base dark:bg-gray-50 dark:text-gray-900"
             href="/intake"
           >
             <SoupIcon />
@@ -56,28 +33,6 @@ export default function NavBar(props: Props) {
           <NavItem href="/meals" icon={<CookingPotIcon className="h-5 w-5"/>} name="Meals"/>
           <NavItem href="/groceries" icon={<ShoppingCartIcon className="h-5 w-5"/>} name="Groceries"/>
         </TooltipProvider>
-      </nav>
-      <nav className="mt-auto flex flex-col items-center gap-4 px-2 sm:py-5">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button className="overflow-hidden rounded-full" size="icon" variant="outline">
-              <UserIcon className="h-5 w-5"/>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="ml-4 min-w-40">
-            <DropdownMenuLabel>{user.name}</DropdownMenuLabel>
-            <DropdownMenuSeparator/>
-            <DropdownMenuItem>
-              <HeadsetIcon className="h-4 w-4 mr-2"/>
-              <span>Support</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator/>
-            <DropdownMenuItem onClick={() => signOut({ callbackUrl: '/', redirect: true })}>
-              <LogOutIcon className="h-4 w-4 mr-2" />
-              <span>Logout</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </nav>
     </aside>
   );
