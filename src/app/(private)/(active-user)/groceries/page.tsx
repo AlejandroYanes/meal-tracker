@@ -1,6 +1,15 @@
 'use client';
 import { useState } from 'react';
-import { EllipsisVerticalIcon, InfoIcon, PencilLineIcon, Trash2Icon } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import {
+  ArrowDownIcon,
+  ArrowUpIcon,
+  EllipsisVerticalIcon,
+  InfoIcon,
+  PencilLineIcon,
+  SearchIcon,
+  Trash2Icon,
+} from 'lucide-react';
 import { type inferRouterOutputs } from '@trpc/server';
 
 import {
@@ -15,6 +24,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  Input,
   Skeleton,
   Table,
   TableBody,
@@ -26,6 +36,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
+  useDebounce,
 } from '@/ui';
 import { api } from '@/trpc/react';
 import { type AppRouter } from '@/server/api/root';
@@ -37,10 +48,40 @@ import DeleteFoodModal from './__components/delete-food-modal';
 type Food = inferRouterOutputs<AppRouter>['food']['list'][0];
 
 export default function MealsPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const search = searchParams.get('search') ?? '';
+  const order = (searchParams.get('order') ?? 'asc') as 'asc' | 'desc';
+
   const [editingFood, setEditingFood] = useState<Food | null>(null);
   const [deletingFood, setDeletingFood] = useState<Food | null>(null);
 
-  const { data: foods = [], isLoading } = api.food.list.useQuery();
+  const { debounceCall } = useDebounce(250);
+
+  const { data: foods = [], isLoading } = api.food.list.useQuery({ search, order });
+
+  const updateRoute = (values: Record<string, string | string[]>) => {
+    const params = new URLSearchParams(searchParams.toString())
+
+    for (const [key, value] of Object.entries(values)) {
+      if (Array.isArray(value)) {
+        params.delete(key);
+        value.forEach((v) => params.append(key, v));
+      } else {
+        value === '' ? params.delete(key) : params.set(key, value);
+      }
+    }
+
+    router.push(pathname + '?' + params.toString());
+  }
+
+  const handleSearch = (value: string) => {
+    debounceCall(() => {
+      updateRoute({ search: value, page: '1' });
+    });
+  }
 
   return (
     <Card>
@@ -53,11 +94,32 @@ export default function MealsPage() {
         </div>
         <AddFood />
       </CardHeader>
-      <CardContent className="pt-6">
+      <CardContent className="flex flex-col gap-6 pt-6">
+        <div className="relative flex-1 md:grow-0">
+          <SearchIcon className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
+          <Input
+            type="search"
+            placeholder="Search..."
+            defaultValue={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full rounded-lg bg-white pl-8 md:w-[200px] lg:w-[300px] dark:bg-gray-950"
+          />
+        </div>
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8"
+                  onClick={() => updateRoute({ order: order === 'asc' ? 'desc' : 'asc' })}
+                >
+                  <span className="mr-1">Name</span>
+                  {order === 'asc' ? <ArrowUpIcon className="h-4 w-4" /> : null}
+                  {order === 'desc' ? <ArrowDownIcon className="h-4 w-4" /> : null}
+                </Button>
+              </TableHead>
               <TableHead className="w-28 text-center">Amount</TableHead>
               <TableHead className="w-28 text-center">price</TableHead>
               <TableHead className="w-28 text-center">Carbs</TableHead>

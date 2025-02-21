@@ -50,7 +50,7 @@ export default function FoodIntakeModal(props: Props) {
   });
   const selectedFoodId = form.watch('food_id');
 
-  const { data: foods = [], isLoading } = api.food.list.useQuery();
+  const { data: foods = [], isLoading } = api.food.list.useQuery({ search: '', order: 'asc' });
   const selectedFood = foods.find(food => selectedFoodId === food.id);
 
   const utils = api.useUtils();

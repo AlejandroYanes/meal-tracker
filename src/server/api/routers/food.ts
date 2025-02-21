@@ -7,9 +7,35 @@ import { tql } from '@/utils/tql';
 
 export const foodRouter = createTRPCRouter({
   list: protectedProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      search: z.string().nullish(),
+      order: z.enum(['asc', 'desc']),
+    }))
+    .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      const foodQ = await sql<{
+      const { search, order } = input;
+
+      const filters = [];
+
+      if (search) {
+        filters.push(tql.fragment`name ILIKE ${`%${search}%`}`);
+      }
+
+      let filterClause = tql.fragment``;
+      if (filters.length > 0) {
+        for (const filter of filters) {
+          filterClause = tql.fragment`${filterClause} AND ${filter}`;
+        }
+      }
+
+      const [listQ, listP] = tql.query`
+        SELECT id, name, description, notes, amount, unit, price, carbs, proteins, fats
+        FROM food
+        WHERE user_id = ${userId} AND is_hidden = false ${filterClause} ORDER BY name ${tql.UNSAFE(order.toUpperCase())}`;
+
+      console.log('listQ', listQ, listP);
+
+      const foodQ = await sql.query<{
         id: number;
         name: string;
         description: string;
@@ -20,10 +46,7 @@ export const foodRouter = createTRPCRouter({
         carbs: number;
         proteins: number;
         fats: number;
-      }>`
-        SELECT id, name, description, notes, amount, unit, price, carbs, proteins, fats
-        FROM food
-        WHERE user_id = ${userId} AND is_hidden = false`;
+      }>(listQ, listP);
 
       return foodQ.rows;
     }),
