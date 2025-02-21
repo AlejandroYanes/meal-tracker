@@ -41,7 +41,7 @@ export function DatePicker(props: DatePickerProps) {
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4 shrink-0" />
-          {date ? format(date, shortDate ? 'PP' : 'PPP') : <span>Pick a date</span>}
+          {date ? <span className="text-sm">{format(date, shortDate ? 'PP' : 'PPP')}</span> : <span>Pick a date</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0 pointer-events-auto">

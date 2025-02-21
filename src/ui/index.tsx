@@ -36,6 +36,7 @@ export * from './separator';
 export * from './sheet';
 export * from './slider';
 export * from './skeleton';
+export * from './screen-size';
 export * from './scroll-area';
 export * from './switch';
 export * from './table';

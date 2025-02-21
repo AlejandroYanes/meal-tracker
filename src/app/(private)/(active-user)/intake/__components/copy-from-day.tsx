@@ -1,3 +1,5 @@
+import { CopyIcon } from 'lucide-react';
+
 import { Button, Calendar, Loader, Popover, PopoverContent, PopoverTrigger, useToast } from '@/ui';
 import { api } from '@/trpc/react';
 
@@ -38,8 +40,9 @@ export default function CopyFromDay(props: Props) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline">
-          Copy from another day
+        <Button variant="outline" className="px-2 min-w-10">
+          <span className="hidden md:inline">Copy from another day</span>
+          <CopyIcon className="w-4 h-4 md:hidden" />
           {isPending ? <Loader size="icon" className="ml-2" /> : null}
         </Button>
       </PopoverTrigger>

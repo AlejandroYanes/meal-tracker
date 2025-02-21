@@ -90,10 +90,10 @@ export default function MealCard(props: Props) {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead className="w-28 text-center">Amount</TableHead>
-              <TableHead className="w-28 text-center">Carbs</TableHead>
-              <TableHead className="w-28 text-center">Proteins</TableHead>
-              <TableHead className="w-28 text-center">Fats</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Amount</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Carbs</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Proteins</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Fats</TableHead>
               <TableHead className="w-20">
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -104,13 +104,23 @@ export default function MealCard(props: Props) {
               const { carbs, proteins, fats } = normaliseExchanges(record);
               return (
                 <TableRow key={record.id}>
-                  <TableCell>{record.name}</TableCell>
-                  <TableCell className="w-28 text-center">
+                  <TableCell>
+                    <div className="flex flex-col gap-2">
+                      <span>{record.name}</span>
+                      <span>
+                        {record.amount_consumed}{record.unit === 'piece' ? ` ${record.unit}` : record.unit} |{' '}
+                        {carbs} C |{' '}
+                        {proteins} P |{' '}
+                        {fats} F
+                      </span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="w-28 text-center hidden md:table-cell">
                     {record.amount_consumed}{record.unit === 'piece' ? ` ${record.unit}` : record.unit}
                   </TableCell>
-                  <TableCell className="w-28 text-center">{carbs}</TableCell>
-                  <TableCell className="w-28 text-center">{proteins}</TableCell>
-                  <TableCell className="w-28 text-center">{fats}</TableCell>
+                  <TableCell className="w-28 text-center hidden md:table-cell">{carbs}</TableCell>
+                  <TableCell className="w-28 text-center hidden md:table-cell">{proteins}</TableCell>
+                  <TableCell className="w-28 text-center hidden md:table-cell">{fats}</TableCell>
                   <TableCell className="w-20">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

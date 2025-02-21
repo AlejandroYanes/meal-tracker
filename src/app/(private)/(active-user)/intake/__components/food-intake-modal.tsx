@@ -79,7 +79,7 @@ export default function FoodIntakeModal(props: Props) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="w-[500px]">
+      <DialogContent className="w-[500px] max-w-full">
         <DialogHeader>
           <DialogTitle>
             What did you eat for {meal.name}?

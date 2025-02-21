@@ -1,7 +1,7 @@
 import { type Metadata } from 'next';
 import { JetBrains_Mono } from 'next/font/google';
 
-import { Toaster } from '@/ui';
+import { ScreenSize, Toaster } from '@/ui';
 import '@/styles/globals.css';
 
 export const metadata: Metadata = {
@@ -20,6 +20,7 @@ export default function RootLayout({
       <body className={font.className}>
         {children}
         <Toaster />
+        {process.env.NODE_ENV === 'development' && <ScreenSize />}
       </body>
     </html>
   );

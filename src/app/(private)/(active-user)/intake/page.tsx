@@ -36,26 +36,26 @@ export default function IntakePage() {
   }
 
   return (
-    <section className="flex flex-col gap-10">
+    <section className="flex flex-col md:gap-10">
       <Card>
-        <CardHeader>
+        <CardHeader className="space-y-0 flex flex-row items-center justify-between">
           <CardTitle>Your Daily intake</CardTitle>
-        </CardHeader>
-        <CardContent className="flex flex-row items-center justify-between">
-          <div className="flex items-center justify-end gap-4">
-            <Button variant="outline" size="icon" onClick={goToPrevDay}>
-              <ChevronLeftIcon className="w-4 h-4" />
-            </Button>
-            <DatePicker date={date} defaultMonth={date} onChange={handleDateChange} />
-            <Button variant="outline" size="icon" onClick={goToNextDay}>
-              <ChevronRightIcon className="w-4 h-4" />
-            </Button>
-            <CopyFromDay day={date} />
-          </div>
           <div className="flex items-center gap-4">
             <GoalRing label="Carbs" ratio={goalsAndSums.carbsRatio} sum={goalsAndSums.carbsSum} total={goalsAndSums.carbsTotals} />
             <GoalRing label="Proteins" ratio={goalsAndSums.proteinsRatio} sum={goalsAndSums.proteinsSum} total={goalsAndSums.proteinsTotals} />
             <GoalRing label="Fats" ratio={goalsAndSums.fatsRatio} sum={goalsAndSums.fatsSum} total={goalsAndSums.fatsTotals} />
+          </div>
+        </CardHeader>
+        <CardContent className="flex flex-row items-center justify-between pb-6">
+          <div className="flex items-center justify-end gap-4 flex-1 md:flex-grow-0">
+            <Button variant="outline" size="icon" onClick={goToPrevDay}>
+              <ChevronLeftIcon className="w-4 h-4" />
+            </Button>
+            <DatePicker date={date} defaultMonth={date} onChange={handleDateChange} className="flex-1 md:flex-grow-0 justify-center md:justify-start" />
+            <Button variant="outline" size="icon" onClick={goToNextDay}>
+              <ChevronRightIcon className="w-4 h-4" />
+            </Button>
+            <CopyFromDay day={date} />
           </div>
         </CardContent>
       </Card>
