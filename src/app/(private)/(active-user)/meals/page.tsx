@@ -91,9 +91,9 @@ export default function MealsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead className="w-28 text-center">Carbs</TableHead>
-              <TableHead className="w-28 text-center">Proteins</TableHead>
-              <TableHead className="w-28 text-center">Fats</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Carbs</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Proteins</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Fats</TableHead>
               <TableHead className="w-28 text-center">
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -112,11 +112,18 @@ export default function MealsPage() {
             {meals.map((meal, index) => (
               <TableRow key={meal.id}>
                 <TableCell>
-                  {meal.name}
+                  <div className="flex flex-col gap-2">
+                    <span>{meal.name}</span>
+                    <span>
+                      {meal.carbs_goal} C |{' '}
+                      {meal.proteins_goal} P |{' '}
+                      {meal.fats_goal} F
+                    </span>
+                  </div>
                 </TableCell>
-                <TableCell className="text-center">{meal.carbs_goal}</TableCell>
-                <TableCell className="text-center">{meal.proteins_goal}</TableCell>
-                <TableCell className="text-center">{meal.fats_goal}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{meal.carbs_goal}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{meal.proteins_goal}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{meal.fats_goal}</TableCell>
                 <TableCell className="text-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

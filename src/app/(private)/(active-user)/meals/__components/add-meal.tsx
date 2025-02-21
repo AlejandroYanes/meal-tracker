@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import { ListPlusIcon } from 'lucide-react';
 
 import { Button } from '@/ui';
 import MealModal, { type MealInput } from './meal-modal';
@@ -9,7 +10,10 @@ export default function AddMeal() {
 
   return (
     <>
-      <Button onClick={() => setShowModal(true)}>Add new meals</Button>
+      <Button onClick={() => setShowModal(true)}>
+        <span className="hidden md:inline">Add new meals</span>
+        <ListPlusIcon className="h-4 w-4 block md:hidden" />
+      </Button>
       {showModal ? <MealModal defaultValues={defaultValues} onClose={() => setShowModal(false)} /> : null}
     </>
   );

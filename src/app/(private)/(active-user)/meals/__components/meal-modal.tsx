@@ -64,7 +64,7 @@ export default function MealModal(props: Props) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="w-[500px]">
+      <DialogContent className="w-[500px] max-w-full">
         <DialogHeader>
           <DialogTitle>Add meal</DialogTitle>
           <DialogDescription>
