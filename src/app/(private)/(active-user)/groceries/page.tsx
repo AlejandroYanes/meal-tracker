@@ -88,7 +88,7 @@ export default function MealsPage() {
       <CardHeader className="space-y-0 flex flex-row items-center justify-between">
         <div className="flex flex-col gap-1">
           <CardTitle>Your groceries</CardTitle>
-          <CardDescription>
+          <CardDescription className="hidden md:block">
             A list of all the food commonly eat and want to track
           </CardDescription>
         </div>
@@ -112,7 +112,7 @@ export default function MealsPage() {
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8"
+                  className="h-8 px-0"
                   onClick={() => updateRoute({ order: order === 'asc' ? 'desc' : 'asc' })}
                 >
                   <span className="mr-1">Name</span>
@@ -120,11 +120,11 @@ export default function MealsPage() {
                   {order === 'desc' ? <ArrowDownIcon className="h-4 w-4" /> : null}
                 </Button>
               </TableHead>
-              <TableHead className="w-28 text-center">Amount</TableHead>
-              <TableHead className="w-28 text-center">price</TableHead>
-              <TableHead className="w-28 text-center">Carbs</TableHead>
-              <TableHead className="w-28 text-center">Proteins</TableHead>
-              <TableHead className="w-28 text-center">Fats</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Amount</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">price</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Carbs</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Proteins</TableHead>
+              <TableHead className="w-28 text-center hidden md:table-cell">Fats</TableHead>
               <TableHead className="w-28 text-center">
                 <span className="sr-only">Actions</span>
               </TableHead>
@@ -159,14 +159,23 @@ export default function MealsPage() {
                         </TooltipProvider>
                       ) : null}
                     </div>
+                    <span>
+                      {`${food.amount} ${food.unit}`} |{' '}
+                      {formatCurrency(food.price, 'gbp')}
+                    </span>
+                    <span>
+                      {food.carbs} C |{' '}
+                      {food.proteins} P |{' '}
+                      {food.fats} F
+                    </span>
                     <span className="text-sm text-muted-foreground">{food.description}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center">{`${food.amount} ${food.unit}`}</TableCell>
-                <TableCell className="text-center">{formatCurrency(food.price, 'gbp')}</TableCell>
-                <TableCell className="text-center">{food.carbs}</TableCell>
-                <TableCell className="text-center">{food.proteins}</TableCell>
-                <TableCell className="text-center">{food.fats}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{`${food.amount} ${food.unit}`}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{formatCurrency(food.price, 'gbp')}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{food.carbs}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{food.proteins}</TableCell>
+                <TableCell className="text-center hidden md:table-cell">{food.fats}</TableCell>
                 <TableCell className="text-center">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

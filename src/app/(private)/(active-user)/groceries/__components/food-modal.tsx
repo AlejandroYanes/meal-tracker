@@ -76,7 +76,7 @@ export default function FoodModal(props: Props) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="w-[700px] max-h-[calc(100vh_-_5%)] overflow-y-auto">
+      <DialogContent className="w-[700px]max-w-full max-h-[calc(100vh_-_5%)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add food</DialogTitle>
           <DialogDescription>
@@ -154,8 +154,14 @@ export default function FoodModal(props: Props) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="g">grams (g)</SelectItem>
-                      <SelectItem value="ml">milliliters (ml)</SelectItem>
+                      <SelectItem value="g">
+                        <span className="hidden md:inline">grams (g)</span>
+                        <span className="md:hidden">gs</span>
+                      </SelectItem>
+                      <SelectItem value="ml">
+                        <span className="hidden md:inline">milliliters (ml)</span>
+                        <span className="md:hidden">mls</span>
+                      </SelectItem>
                       <SelectItem value="piece">piece</SelectItem>
                     </SelectContent>
                   </Select>
