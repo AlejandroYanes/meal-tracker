@@ -76,7 +76,7 @@ export default function FoodModal(props: Props) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="w-[700px]max-w-full max-h-[calc(100vh_-_5%)] overflow-y-auto">
+      <DialogContent className="w-[700px] max-w-full max-h-[calc(100vh_-_5%)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Add food</DialogTitle>
           <DialogDescription>

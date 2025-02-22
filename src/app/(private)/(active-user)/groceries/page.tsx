@@ -159,11 +159,11 @@ export default function MealsPage() {
                         </TooltipProvider>
                       ) : null}
                     </div>
-                    <span>
+                    <span className="md:hidden">
                       {`${food.amount} ${food.unit}`} |{' '}
                       {formatCurrency(food.price, 'gbp')}
                     </span>
-                    <span>
+                    <span className="md:hidden">
                       {food.carbs} C |{' '}
                       {food.proteins} P |{' '}
                       {food.fats} F
