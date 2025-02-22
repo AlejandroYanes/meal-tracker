@@ -22,8 +22,6 @@ export const ScreenSize = () => {
 
   const { width, height } = dimensions;
 
-  console.log('screen size', { width, height });
-
   return (
     <div className="fixed bottom-5 right-5 flex items-center gap-2 rounded-full bg-black px-2.5 py-1 font-mono text-xs font-medium text-white">
       <span>
