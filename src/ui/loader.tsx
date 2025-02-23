@@ -52,6 +52,7 @@ const innerVariants = cva(
         rose: 'border-t-rose-500',
         black: 'border-t-neutral-950',
         white: 'border-t-white',
+        neutral: 'border-t-neutral-500'
       },
     },
     defaultVariants: {
