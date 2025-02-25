@@ -11,10 +11,10 @@ export default async function Home() {
   }
 
   return (
-    <section className="w-screen h-screen flex flex-col justify-center items-center">
-      <div className="mx-auto grid w-[480px] gap-6">
-        <div className="grid gap-2 text-center">
-          <h1 className="text-3xl font-bold">Welcome to Meal Tracker</h1>
+    <section className="w-screen h-screen flex flex-col justify-center items-center px-4 md:px-0">
+      <div className="mx-auto flex flex-col md:w-[480px] gap-10">
+        <div className="flex flex-col gap-2 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold">Welcome to Meal Tracker</h1>
           <p className="text-balance text-muted-foreground">
             Enter your email below to login to your account
           </p>

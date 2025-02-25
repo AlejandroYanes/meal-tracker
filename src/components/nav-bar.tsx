@@ -3,9 +3,10 @@
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import type { Session } from 'next-auth';
-import { CalendarDaysIcon, CookingPotIcon, ShoppingCartIcon, SoupIcon } from 'lucide-react';
+import { signOut } from 'next-auth/react';
+import { CalendarDaysIcon, CookingPotIcon, LogOutIcon, ShoppingCartIcon, SoupIcon } from 'lucide-react';
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui';
+import { Button, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/ui';
 
 interface Props {
   session: Session;
@@ -32,6 +33,18 @@ export default function NavBar(props: Props) {
           <NavItem href="/intake" icon={<CalendarDaysIcon className="h-7 md:h-5 w-7 md:w-5"/>} name="Intake records"/>
           <NavItem href="/meals" icon={<CookingPotIcon className="h-7 md:h-5 w-7 md:w-5"/>} name="Meals"/>
           <NavItem href="/groceries" icon={<ShoppingCartIcon className="h-7 md:h-5 w-7 md:w-5"/>} name="Groceries"/>
+        </TooltipProvider>
+      </nav>
+      <nav className="mt-auto pb-4 hidden md:flex flex-col items-center justify-center">
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" variant="ghost" onClick={() => signOut({ callbackUrl: '/', redirect: true })}>
+                <LogOutIcon className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent side="right">Logout</TooltipContent>
+          </Tooltip>
         </TooltipProvider>
       </nav>
     </aside>
