@@ -15,6 +15,7 @@ export * from './code-block';
 export * from './command';
 export * from './color-picker';
 export * from './date-picker';
+export * from './delay-render';
 export * from './dialog';
 export * from './drawer';
 export * from './dropdown-menu';

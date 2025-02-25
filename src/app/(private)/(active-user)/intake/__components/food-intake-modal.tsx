@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { z } from 'zod';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { keepPreviousData } from '@tanstack/query-core';
 import type { inferRouterOutputs } from '@trpc/server';
 import { SearchIcon } from 'lucide-react';
 
 import {
-  Button,
+  Button, DelayRender,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -54,15 +54,6 @@ export default function FoodIntakeModal(props: Props) {
     },
     resolver: zodResolver(foodIntakeSchema),
   });
-  const selectedFoodId = form.watch('food_id');
-
-  const { debounceCall } = useDebounce(450);
-  const [foodSearch, setFoodSearch] = useState<string>('');
-  const { data: foods = [], isFetching: isFetchingFoods } = api.food.list.useQuery(
-    { search: foodSearch, order: 'asc' },
-    { placeholderData: keepPreviousData },
-  );
-  const selectedFood = foods.find(food => selectedFoodId === food.id);
 
   const utils = api.useUtils();
   const { mutate: recordIntake, isPending: isCreating, error: createError } = api.intake.add.useMutation({
@@ -88,14 +79,6 @@ export default function FoodIntakeModal(props: Props) {
     }
   });
 
-  const handleSearch = (value: string) => {
-    if (value !== '' && value.length < 3) return;
-    debounceCall(() => {
-      console.log('setting search: ', value);
-      setFoodSearch(value);
-    });
-  }
-
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent data-el="intake-modal" className="w-[500px] max-w-full min-h-96 h-screen md:h-auto md:max-h-[calc(100vh_-_5%)] overflow-y-auto flex flex-col">
@@ -105,67 +88,11 @@ export default function FoodIntakeModal(props: Props) {
           </DialogTitle>
         </DialogHeader>
         <form className="flex-1 flex flex-col gap-6 pt-6" onSubmit={handleSubmit}>
-          <Controller
-            name="food_id"
-            control={form.control}
-            render={({ field }) => (
-              <div className="flex flex-col gap-2">
-                <Label>Food item<sup className="ml-2">*</sup></Label>
-                <Select
-                  value={field.value.toString()}
-                  onValueChange={(value) => field.onChange(Number(value))}
-                >
-                  <SelectTrigger className="w-full">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent
-                    // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
-                    container={document.querySelector('[data-el="intake-modal"]') as HTMLElement}
-                    className="max-h-96 md:max-h-80 overflow-y-auto"
-                  >
-                    <div className="relative flex-1">
-                      {isFetchingFoods
-                        ? <Loader size="icon" className="absolute left-1.5 top-3.5" color="neutral" />
-                        : <SearchIcon className="absolute left-1.5 top-3 h-4 w-4 text-gray-500 dark:text-gray-400" />}
-                      <Input
-                        type="search"
-                        placeholder="Search..."
-                        defaultValue={foodSearch}
-                        onKeyDown={(e) => e.stopPropagation()}
-                        onChange={(e) => handleSearch(e.target.value)}
-                        className="w-full rounded-none border-0 bg-white pl-8"
-                      />
-                    </div>
-                    <SelectSeparator />
-                    {foods.map((food) => (
-                      <SelectItem key={food.id} value={food.id.toString()}>{food.name}</SelectItem>
-                    ))}
-                    {!isFetchingFoods && foods.length === 0 ? (
-                      <div className="p-4 text-center text-sm text-muted-foreground">
-                        No options available
-                      </div>
-                    ) : null}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          />
-          <Controller
-            name="amount"
-            control={form.control}
-            render={({ field }) => (
-              <InputWithLabel
-                required
-                type="number"
-                label="Amount"
-                {...field}
-                value={field.value ?? 0}
-                error={form.formState.errors.amount?.message}
-                onChange={(e) => field.onChange(Number(e.target.value))}
-                hint={craftFoodDetails(selectedFood)}
-              />
-            )}
-          />
+          <FormProvider {...form}>
+            <DelayRender delay={0}>
+              <FoodIntakeForm />
+            </DelayRender>
+          </FormProvider>
           {errorMessage ? (
             <span className="text-red-500 text-sm font-medium">{errorMessage}</span>
           ) : null}
@@ -178,6 +105,93 @@ export default function FoodIntakeModal(props: Props) {
         </form>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function FoodIntakeForm() {
+  const form = useFormContext<FoodIntake>();
+  const selectedFoodId = form.watch('food_id');
+
+  const { debounceCall } = useDebounce(450);
+  const [foodSearch, setFoodSearch] = useState<string>('');
+  const { data: foods = [], isFetching: isFetchingFoods } = api.food.list.useQuery(
+    { search: foodSearch, order: 'asc' },
+    { placeholderData: keepPreviousData },
+  );
+  const selectedFood = foods.find(food => selectedFoodId === food.id);
+
+  const handleSearch = (value: string) => {
+    if (value !== '' && value.length < 3) return;
+    debounceCall(() => {
+      console.log('setting search: ', value);
+      setFoodSearch(value);
+    });
+  }
+
+  return (
+    <>
+      <Controller
+        name="food_id"
+        control={form.control}
+        render={({ field }) => (
+          <div className="flex flex-col gap-2">
+            <Label>Food item<sup className="ml-2">*</sup></Label>
+            <Select
+              value={field.value.toString()}
+              onValueChange={(value) => field.onChange(Number(value))}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent
+                // eslint-disable-next-line @typescript-eslint/non-nullable-type-assertion-style
+                container={document.querySelector('[data-el="intake-modal"]') as HTMLElement}
+                className="max-h-96 md:max-h-80 overflow-y-auto"
+              >
+                <div className="relative flex-1">
+                  {isFetchingFoods
+                    ? <Loader size="icon" className="absolute left-1.5 top-3.5" color="neutral" />
+                    : <SearchIcon className="absolute left-1.5 top-3 h-4 w-4 text-gray-500 dark:text-gray-400" />}
+                  <Input
+                    type="search"
+                    placeholder="Search..."
+                    defaultValue={foodSearch}
+                    onKeyDown={(e) => e.stopPropagation()}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="w-full rounded-none border-0 bg-white pl-8"
+                  />
+                </div>
+                <SelectSeparator />
+                {foods.map((food) => (
+                  <SelectItem key={food.id} value={food.id.toString()}>{food.name}</SelectItem>
+                ))}
+                {!isFetchingFoods && foods.length === 0 ? (
+                  <div className="p-4 text-center text-sm text-muted-foreground">
+                    No options available
+                  </div>
+                ) : null}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+      />
+      <Controller
+        name="amount"
+        control={form.control}
+        render={({ field }) => (
+          <InputWithLabel
+            required
+            type="number"
+            label="Amount"
+            {...field}
+            value={field.value ?? 0}
+            error={form.formState.errors.amount?.message}
+            onChange={(e) => field.onChange(Number(e.target.value))}
+            hint={craftFoodDetails(selectedFood)}
+          />
+        )}
+      />
+    </>
   );
 }
 
