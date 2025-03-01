@@ -1,5 +1,7 @@
 'use client';
 import { useState } from 'react';
+import Link from 'next/link';
+import { format } from 'date-fns';
 import { EllipsisVerticalIcon, NotebookPenIcon, PencilLineIcon, Trash2Icon } from 'lucide-react';
 
 import {
@@ -10,7 +12,8 @@ import {
   CardTitle,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem, DropdownMenuLabel,
+  DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
   Skeleton,
   Table,
@@ -24,7 +27,7 @@ import { api } from '@/trpc/react';
 import { generateGoalsAndSums, normaliseExchanges } from '@/utils/meal-intakes';
 import GoalRing from '@/components/goal-ring';
 import FoodIntakeModal from './food-intake-modal';
-import DeleteFoodIntakeModal from '@/app/(private)/(active-user)/intake/__components/delete-food-intake-modal';
+import DeleteFoodIntakeModal from './delete-food-intake-modal';
 
 interface Props {
   day: Date;
@@ -82,10 +85,16 @@ export default function MealCard(props: Props) {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-        <Button variant="link" className="ml-auto" onClick={() => setShowAddModal(true)}>
+        <Button variant="link" className="ml-auto hidden md:inline-flex" onClick={() => setShowAddModal(true)}>
           <NotebookPenIcon className="w-4 h-4 mr-2" />
           Add food record
         </Button>
+        <Link href={`/intake/meal-intake?meal=${meal.id}&date=${format(day, 'yyyy-MM-dd')}`} className="ml-auto md:hidden">
+          <Button variant="link">
+            <NotebookPenIcon className="w-4 h-4 mr-2" />
+            Add food record
+          </Button>
+        </Link>
         <Table className="table-fixed">
           <TableHeader>
             <TableRow>
@@ -131,6 +140,7 @@ export default function MealCard(props: Props) {
                       <DropdownMenuContent className="w-40" side="bottom" align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuItem
+                          className="hidden md:block"
                           onClick={() => {
                             setEditingFoodIntake({
                               id: record.id,
@@ -142,6 +152,12 @@ export default function MealCard(props: Props) {
                           <PencilLineIcon className="w-4 h-4 mr-2" />
                           <span>Edit</span>
                         </DropdownMenuItem>
+                        <Link href={`/intake/meal-intake?meal=${meal.id}&date=${format(day, 'yyyy-MM-dd')}&record=${record.id}`}>
+                          <DropdownMenuItem className="md:hidden">
+                            <PencilLineIcon className="w-4 h-4 mr-2" />
+                            <span>Edit</span>
+                          </DropdownMenuItem>
+                        </Link>
                         <DropdownMenuItem onClick={() => setDeletingFoodIntake(record.id)}>
                           <Trash2Icon className="w-4 h-4 mr-2" />
                           <span>Remove</span>
