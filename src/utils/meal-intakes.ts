@@ -57,7 +57,7 @@ function getNumberOrZero(num: number) {
   return num;
 }
 
-export function calculateExchanges(food: FoodIntake) {
+export function calculateExchanges(food: { base_amount: number; amount_consumed: number; fats: number; proteins: number; carbs: number }) {
   const { base_amount, amount_consumed, fats, proteins, carbs } = food;
 
   const consumptionRatio = amount_consumed / base_amount;

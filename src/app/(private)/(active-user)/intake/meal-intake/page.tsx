@@ -55,7 +55,7 @@ export default async function MealIntake(props: Props) {
   }
 
   return (
-    <Card className="pt-4">
+    <Card className="pt-4 h-screen pb-16 flex flex-col">
       <Link href="/intake">
         <Button variant="link">
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
@@ -67,7 +67,7 @@ export default async function MealIntake(props: Props) {
           What did you eat for {meal.name}?
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-6">
+      <CardContent className="flex-1 flex flex-col gap-6">
         <FoodIntakeForm meal={meal} day={new Date(searchParams.date)} />
       </CardContent>
     </Card>

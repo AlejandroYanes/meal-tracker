@@ -123,7 +123,6 @@ function FoodIntakeForm() {
   const handleSearch = (value: string) => {
     if (value !== '' && value.length < 3) return;
     debounceCall(() => {
-      console.log('setting search: ', value);
       setFoodSearch(value);
     });
   }

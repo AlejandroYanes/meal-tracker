@@ -8,12 +8,17 @@ import { tql } from '@/utils/tql';
 export const foodRouter = createTRPCRouter({
   list: protectedProcedure
     .input(z.object({
+      list_on_search: z.boolean().default(false),
       search: z.string().nullish(),
       order: z.enum(['asc', 'desc']),
     }))
     .query(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
-      const { search, order } = input;
+      const { search, order, list_on_search } = input;
+
+      if (list_on_search && !search) {
+        return [];
+      }
 
       const filters = [];
 
@@ -28,10 +33,13 @@ export const foodRouter = createTRPCRouter({
         }
       }
 
+      const limitClause = list_on_search ? tql.fragment`LIMIT 3` : tql.fragment``;
+
       const [listQ, listP] = tql.query`
         SELECT id, name, description, notes, amount, unit, price, carbs, proteins, fats
         FROM food
-        WHERE user_id = ${userId} AND is_hidden = false ${filterClause} ORDER BY name ${tql.UNSAFE(order.toUpperCase())}`;
+        WHERE user_id = ${userId} AND is_hidden = false ${filterClause}
+        ORDER BY name ${tql.UNSAFE(order.toUpperCase())} ${limitClause}`;
 
       console.log('listQ', listQ, listP);
 
