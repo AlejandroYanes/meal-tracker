@@ -17,14 +17,13 @@ function EmailWrapper(props: { children: ReactNode }) {
 
 interface Payload {
   to: string;
-  from?: string;
   subject: string;
   body: ReactElement | string;
 }
 
 export async function sendEmail(payload: Payload) {
   const { error, data } = await resend.emails.send({
-    from: payload.from ?? 'Meal Tracker <contact@auth-natant.co.uk>',
+    from: 'Meal Tracker <contact@auth-natant.co.uk>',
     to: payload.to,
     subject: payload.subject,
     react: (
