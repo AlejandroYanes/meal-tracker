@@ -24,7 +24,7 @@ interface Payload {
 
 export async function sendEmail(payload: Payload) {
   const { error, data } = await resend.emails.send({
-    from: payload.from ?? 'Meal Tracker <contact@mndy.link>',
+    from: payload.from ?? 'Meal Tracker <contact@auth-natant.co.uk>',
     to: payload.to,
     subject: payload.subject,
     react: (
@@ -49,7 +49,7 @@ interface BatchPayload {
 
 export async function sendEmailBatch(payload: BatchPayload) {
   const batch = payload.to.map((to) => ({
-    from: payload.from ?? 'Writer <contact@mndy.link>',
+    from: payload.from ?? 'Writer <contact@auth-natant.co.uk>',
     to,
     subject: payload.subject,
     react: (
