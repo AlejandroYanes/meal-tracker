@@ -1,19 +1,10 @@
-import { type ReactElement, type ReactNode } from 'react';
+import { type ReactElement } from 'react';
 import { Resend } from 'resend';
-import { Tailwind } from '@react-email/components';
 
 import { env } from '@/env';
 import { isProductionServer } from '@/utils/envs';
-import tailwindConfig from '../../tailwind.config';
 
 const resend = new Resend(env.RESEND_API_KEY);
-// const URL = env.PLATFORM_URL || `https://${process.env.VERCEL_URL}`;
-
-function EmailWrapper(props: { children: ReactNode }) {
-  return (
-    <Tailwind config={tailwindConfig as any}>{props.children}</Tailwind>
-  );
-}
 
 interface Payload {
   to: string;
@@ -26,13 +17,12 @@ export async function sendEmail(payload: Payload) {
     from: 'Meal Tracker <contact@auth-natant.co.uk>',
     to: payload.to,
     subject: payload.subject,
-    react: (
-      <EmailWrapper>{payload.body}</EmailWrapper>
-    ),
+    react: payload.body,
   });
 
   if (error) {
-    console.log(`❌ Error sending email to ${payload.to}: ${error.message}`);
+    console.log(`❌ Error sending email to ${payload.to}`);
+    console.error(error);
     return { success: false, email: payload.to, message: error.message };
   }
 
@@ -51,9 +41,7 @@ export async function sendEmailBatch(payload: BatchPayload) {
     from: payload.from ?? 'Writer <contact@auth-natant.co.uk>',
     to,
     subject: payload.subject,
-    react: (
-      <EmailWrapper>{payload.body}</EmailWrapper>
-    ),
+    react: payload.body,
   }));
 
   const { error, data } = await resend.batch.send(batch);
